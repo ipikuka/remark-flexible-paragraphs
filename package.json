@@ -3,27 +3,19 @@
   "version": "1.0.0-alpha.1",
   "description": "Remark plugin to add custom paragraphs with customizable properties in markdown",
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    }
-  },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
+  "exports": "./dist/esm/index.js",
+  "main": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {
-    "build": "npm run build:esm && npm run build:cjs",
-    "build:esm": "tsc",
-    "build:cjs": "tsc --module commonjs --outDir dist/cjs",
-    "lint": "eslint \"{**/*,*}.{js,ts}\"",
-    "prettier": "prettier --write \"{src,tests,example/src}/**/*.{js,ts}\"",
+    "prebuild": "rimraf dist",
+    "build": "npm run prebuild && tsc",
+    "lint": "eslint .",
+    "prettier": "prettier --write .",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs",
-    "test:file": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs with_options.spec.ts",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run prettier && npm run lint",
-    "prebuild": "rimraf dist"
+    "test:regex": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs regex.spec.ts",
+    "test:file": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.cjs paragraphs.spec.ts",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm test && npm run prettier && npm run lint"
   },
   "files": [
     "dist",
