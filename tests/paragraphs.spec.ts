@@ -55,11 +55,12 @@ describe("no options - success", () => {
   // ******************************************
   it("standart usage without classification and alignment", async () => {
     const input = dedent(`
-      ~> hello standard
+      ~> standard
+
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(
-      `"<p class="flexible-paragraph">hello standard</p>"`,
+      `"<p class="flexible-paragraph">standard</p>"`,
     );
   });
 
@@ -88,7 +89,7 @@ describe("no options - success", () => {
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p align="center" class="flexible-paragraph flexigraph-warning flexigraph-flex flexigraph-type-2">hello
+      "<p class="flexible-paragraph flexiparaph-warning flexiparaph-framed flexiparaph-type-2 flexiparaph-align-justify" style="text-align:justify">hello
       <strong>bold</strong> with
       continue <em>italic</em></p>"
     `);
@@ -103,9 +104,9 @@ describe("no options - success", () => {
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p align="center" class="flexible-paragraph flexigraph-warning flexigraph-type-2 flexigraph-grid">hello</p>
+      "<p class="flexible-paragraph flexiparaph-warning flexiparaph-type-2 flexiparaph-green flexiparaph-align-center" style="text-align:center">hello</p>
       <p class="flexible-paragraph"><strong>bold</strong> with</p>
-      <p align="center" class="flexible-paragraph">continue <em>italic</em></p>"
+      <p class="flexible-paragraph flexiparaph-align-center" style="text-align:center">continue <em>italic</em></p>"
     `);
   });
 
@@ -120,9 +121,9 @@ describe("no options - success", () => {
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p align="right" class="flexible-paragraph flexigraph-warning">hello
+      "<p class="flexible-paragraph flexiparaph-warning flexiparaph-align-right" style="text-align:right">hello
       <strong>bold</strong> with</p>
-      <p align="left" class="flexible-paragraph flexigraph-warning">xxx
+      <p class="flexible-paragraph flexiparaph-warning flexiparaph-align-left" style="text-align:left">xxx
       continue <em>italic</em></p>
       <p class="flexible-paragraph">yyy</p>"
     `);
@@ -150,15 +151,15 @@ describe("no options - success", () => {
 
     expect(await process(input)).toMatchInlineSnapshot(`
       "<p><strong>bold</strong> with</p>
-      <p align="right" class="flexible-paragraph flexigraph-warning">hello warning</p>
-      <p align="left" class="flexible-paragraph flexigraph-success">xxx</p>
+      <p class="flexible-paragraph flexiparaph-warning flexiparaph-align-right" style="text-align:right">hello warning</p>
+      <p class="flexible-paragraph flexiparaph-success flexiparaph-align-left" style="text-align:left">xxx</p>
       <p>continue <em>italic</em></p>
       <p><em>italic</em></p>
-      <p align="center" class="flexible-paragraph">yyy <strong>bold</strong>
+      <p class="flexible-paragraph flexiparaph-align-justify" style="text-align:justify">yyy <strong>bold</strong>
       aaa <em>italic</em></p>
       <p><em>italic</em> continue</p>
       <p><em>italic</em> content</p>
-      <p align="center" class="flexible-paragraph flexigraph-type-0">zzz
+      <p class="flexible-paragraph flexiparaph-type-0 flexiparaph-align-justify" style="text-align:justify">zzz
       <em>italic</em></p>"
     `);
   });
@@ -168,7 +169,7 @@ describe("no options - success", () => {
     const input = dedent(`
       another paragraph
 
-      abc *ithalic* ~w|> hello
+      abc *italic* ~w|> hello
       ~:s> aaa **strong** bbb ~>
       ccc
       ~|> yyy
@@ -179,12 +180,12 @@ describe("no options - success", () => {
 
     expect(await process(input)).toMatchInlineSnapshot(`
       "<p>another paragraph</p>
-      <p>abc <em>ithalic</em></p>
-      <p align="center" class="flexible-paragraph flexigraph-warning">hello</p>
-      <p align="left" class="flexible-paragraph flexigraph-success">aaa <strong>strong</strong> bbb</p>
+      <p>abc <em>italic</em></p>
+      <p class="flexible-paragraph flexiparaph-warning flexiparaph-align-center" style="text-align:center">hello</p>
+      <p class="flexible-paragraph flexiparaph-success flexiparaph-align-left" style="text-align:left">aaa <strong>strong</strong> bbb</p>
       <p class="flexible-paragraph">ccc</p>
-      <p align="center" class="flexible-paragraph">yyy</p>
-      <p align="right" class="flexible-paragraph flexigraph-type-0">zzz</p>
+      <p class="flexible-paragraph flexiparaph-align-center" style="text-align:center">yyy</p>
+      <p class="flexible-paragraph flexiparaph-type-0 flexiparaph-align-right" style="text-align:right">zzz</p>
       <p><strong>another paragraph</strong></p>"
     `);
   });
@@ -193,16 +194,20 @@ describe("no options - success", () => {
   it("alignment", async () => {
     const input = dedent(`
       ~|> content
+      ~:> content
       ~:|> content
       ~|:> content
+      ~:|:> content
       ~::> content
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p align="center" class="flexible-paragraph">content</p>
-      <p align="center" class="flexible-paragraph">content</p>
-      <p align="center" class="flexible-paragraph">content</p>
-      <p align="center" class="flexible-paragraph">content</p>"
+      "<p class="flexible-paragraph flexiparaph-align-center" style="text-align:center">content</p>
+      <p class="flexible-paragraph flexiparaph-align-left" style="text-align:left">content</p>
+      <p class="flexible-paragraph flexiparaph-align-left" style="text-align:left">content</p>
+      <p class="flexible-paragraph flexiparaph-align-right" style="text-align:right">content</p>
+      <p class="flexible-paragraph flexiparaph-align-justify" style="text-align:justify">content</p>
+      <p class="flexible-paragraph flexiparaph-align-justify" style="text-align:justify">content</p>"
     `);
   });
 
@@ -210,20 +215,20 @@ describe("no options - success", () => {
   it("one classification", async () => {
     const input = dedent(`
       ~s> content
-      ~s|> content
-      ~|s> content
-      ~:s:> content
       ~:s> content
       ~s:> content
+      ~:s:> content
+      ~s|> content
+      ~|s> content
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p class="flexible-paragraph flexigraph-success">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-success">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-success">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-success">content</p>
-      <p align="left" class="flexible-paragraph flexigraph-success">content</p>
-      <p align="right" class="flexible-paragraph flexigraph-success">content</p>"
+      "<p class="flexible-paragraph flexiparaph-success">content</p>
+      <p class="flexible-paragraph flexiparaph-success flexiparaph-align-left" style="text-align:left">content</p>
+      <p class="flexible-paragraph flexiparaph-success flexiparaph-align-right" style="text-align:right">content</p>
+      <p class="flexible-paragraph flexiparaph-success flexiparaph-align-justify" style="text-align:justify">content</p>
+      <p class="flexible-paragraph flexiparaph-success flexiparaph-align-center" style="text-align:center">content</p>
+      <p class="flexible-paragraph flexiparaph-success flexiparaph-align-center" style="text-align:center">content</p>"
     `);
   });
 
@@ -238,11 +243,11 @@ describe("no options - success", () => {
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p class="flexible-paragraph flexigraph-warning">classified as "warning"</p>
-      <p class="flexible-paragraph flexigraph-danger">classified as "danger"</p>
-      <p class="flexible-paragraph flexigraph-info">classified as "info"</p>
-      <p class="flexible-paragraph flexigraph-note">classified as "note"</p>
-      <p class="flexible-paragraph flexigraph-tip">classified as "tip"</p>"
+      "<p class="flexible-paragraph flexiparaph-warning">classified as "warning"</p>
+      <p class="flexible-paragraph flexiparaph-danger">classified as "danger"</p>
+      <p class="flexible-paragraph flexiparaph-info">classified as "info"</p>
+      <p class="flexible-paragraph flexiparaph-note">classified as "note"</p>
+      <p class="flexible-paragraph flexiparaph-tip">classified as "tip"</p>"
     `);
   });
 
@@ -250,8 +255,8 @@ describe("no options - success", () => {
   it("two classification", async () => {
     const input = dedent(`
       ~gw> content
-      ~gw:> content
       ~:gw> content
+      ~gw:> content
       ~:gw:> content
       ~|gw> content
       ~g|w> content
@@ -259,13 +264,13 @@ describe("no options - success", () => {
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p class="flexible-paragraph flexigraph-grid flexigraph-warning">content</p>
-      <p align="right" class="flexible-paragraph flexigraph-grid flexigraph-warning">content</p>
-      <p align="left" class="flexible-paragraph flexigraph-grid flexigraph-warning">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-grid flexigraph-warning">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-grid flexigraph-warning">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-grid flexigraph-warning">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-grid flexigraph-warning">content</p>"
+      "<p class="flexible-paragraph flexiparaph-green flexiparaph-warning">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-warning flexiparaph-align-left" style="text-align:left">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-warning flexiparaph-align-right" style="text-align:right">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-warning flexiparaph-align-justify" style="text-align:justify">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-warning flexiparaph-align-center" style="text-align:center">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-warning flexiparaph-align-center" style="text-align:center">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-warning flexiparaph-align-center" style="text-align:center">content</p>"
     `);
   });
 
@@ -283,14 +288,31 @@ describe("no options - success", () => {
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p class="flexible-paragraph flexigraph-grid flexigraph-type-2 flexigraph-caution">content</p>
-      <p align="left" class="flexible-paragraph flexigraph-grid flexigraph-type-2 flexigraph-caution">content</p>
-      <p align="right" class="flexible-paragraph flexigraph-grid flexigraph-type-2 flexigraph-caution">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-grid flexigraph-type-2 flexigraph-caution">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-grid flexigraph-type-2 flexigraph-caution">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-grid flexigraph-type-2 flexigraph-caution">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-grid flexigraph-type-2 flexigraph-caution">content</p>
-      <p align="center" class="flexible-paragraph flexigraph-grid flexigraph-type-2 flexigraph-caution">content</p>"
+      "<p class="flexible-paragraph flexiparaph-green flexiparaph-type-2 flexiparaph-caution">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-type-2 flexiparaph-caution flexiparaph-align-left" style="text-align:left">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-type-2 flexiparaph-caution flexiparaph-align-right" style="text-align:right">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-type-2 flexiparaph-caution flexiparaph-align-justify" style="text-align:justify">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-type-2 flexiparaph-caution flexiparaph-align-center" style="text-align:center">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-type-2 flexiparaph-caution flexiparaph-align-center" style="text-align:center">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-type-2 flexiparaph-caution flexiparaph-align-center" style="text-align:center">content</p>
+      <p class="flexible-paragraph flexiparaph-green flexiparaph-type-2 flexiparaph-caution flexiparaph-align-center" style="text-align:center">content</p>"
+    `);
+  });
+
+  // ******************************************
+  it("Example in README", async () => {
+    const input = dedent(`
+      ~> Standard flexible paragraph
+      =:a:> Alert paragraph justified in a wrapper
+      ~:s> Success paragraph aligned left
+      =|> Centered paragraph in a wrapper
+    `);
+
+    expect(await process(input)).toMatchInlineSnapshot(`
+      "<p class="flexible-paragraph">Standard flexible paragraph</p>
+      <div class="flexible-paragraph-wrapper"><p class="flexible-paragraph flexiparaph-alert flexiparaph-align-justify" style="text-align:justify">Alert paragraph justified in a wrapper</p></div>
+      <p class="flexible-paragraph flexiparaph-success flexiparaph-align-left" style="text-align:left">Success paragraph aligned left</p>
+      <div class="flexible-paragraph-wrapper"><p class="flexible-paragraph flexiparaph-align-center" style="text-align:center">Centered paragraph in a wrapper</p></div>"
     `);
   });
 });
