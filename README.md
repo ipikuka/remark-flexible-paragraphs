@@ -13,12 +13,11 @@ This package is a [unified][unified] ([remark][remark]) plugin to add custom par
 
 ## When should I use this?
 
-This plugin is useful if you want to **add a custom paragraph** in markdown, _with custom class name and also additional properties_.
-
+This plugin is useful if you want to **add a custom paragraph** in markdown, _with alignment support, custom class name, custom classifications, and also additional properties_. This plugin also give an option to wrap the paragraph with a container. **You can easily center or align the paragraphs with the `remark-flexible-paragraphs` plugin.**
 
 ## Installation
 
-This package is suitable for ESM and CommonJs module system. In Node.js (version 12.20+, 14.14+, or 16.0+), install with npm:
+This package is suitable for ESM only. In Node.js (version 14.14+, 16.0+), install with npm:
 
 ```bash
 npm install remark-flexible-paragraphs
@@ -32,12 +31,16 @@ yarn add remark-flexible-paragraphs
 
 ## Usage
 
-### ???
+#### ~> [paragraph content]
 
-Say we have the following file, `example.md`, which consists a flexible paragraph. 
+#### => [paragraph content wrapped in a container]
+
+Say we have the following file, `example.md`, which consists a flexible paragraph.
 
 ```markdown
-???
+I am a normal paragraph
+~> I am a flexible paragraph
+=> I am a flexible paragraph wrapped in a div
 ```
 
 And our module, `example.js`, looks as follows:
@@ -67,13 +70,128 @@ async function main() {
 Now, running `node example.js` yields:\
 
 ```html
-???
+<p>I am a normal paragraph</p>
+<p class="flexible-paragraph">I am a flexible paragraph</p>
+<div class="flexible-paragraph-wrapper">
+  <p class="flexible-paragraph">I am a flexible paragraph wrapped in a div</p>
+</div>
 ```
 
 Without `remark-flexible-paragraphs`, you’d get:
 
 ```html
-???
+<p>I am a normal paragraph ~> I am a flexible paragraph => I am a flexible paragraph wrapped in a div</p>
+```
+
+## Further Usage
+
+**The way of the usage (it is easy):**
+
+1. choose the marker: **`~>`** for paragraph; **`=>`** for paragraph in a wrapper
+2. put the marker **`~>`** or **`=>`** where the flexible paragraph begins
+3. choose the character(s) from the dictionary **`[a-z0-9]` (only lowercase and numbers)** for classification
+4. each dictionary key has a predefined but customizable classification value (some are `undefined` yet)
+5. put the character(s) into middle of the marker **(in order to add classification)**
+6. it has no alignment by default
+7. if you want **to center it**, use a pipe **`|`**
+8. if you want **to align it to left**, use a colon **`:`** at the left side
+9. if you want **to align it to right**, use a colon **`:`** at the right side
+10. if you want **to justify it**, use a colon **`:`** at both sides
+11. if there is no classification, but want to align it, use the colon with the pipe:
+
+- use **`:|`** for **left alignment**
+- use **`|:`** for **right alignment**
+- use **`:|:`** for **justify alignment**
+- use **`::`** for **justify alignment**
+- use **`|`** for **center alignment**
+
+```markdown
+~> paragraph with no classification and no alignment
+
+~|> paragraph center-aligned with no classification
+~:|> paragraph left-aligned with no classification
+~|:> paragraph right-aligned with no classification
+~::> paragraph justify-aligned with no classification
+
+=> paragraph in a wrapper with no classification and no alignment
+
+=|> paragraph center-aligned in a wrapper with no classification
+=:|> paragraph left-aligned in a wrapper with no classification
+=|:> paragraph right-aligned in a wrapper with no classification
+=::> paragraph justify-aligned in a wrapper with no classification
+
+~s> classified as "success" with no alignment
+~s|> center-aligned and classified as "success"
+~|s> center-aligned and classified as "success"
+~:s> left-aligned and classified as "success"
+~s:> right-aligned and classified as "success"
+~:s:> justify-aligned and classified as "success"
+
+~w> classified as "warning" with no alignment
+~d> classified as "danger" with no alignment
+~i> classified as "info" with no alignment
+~n> classified as "note" with no alignment
+~t> classified as "tip" with no alignment
+
+~aw> classified as "alert" and "warning" with no alignment
+~:aw> left-aligned and classified as "alert" and "warning"
+~aw:> right-aligned and classified as "alert" and "warning"
+~:aw:> justify-aligned and classified as "alert" and "warning"
+~|aw> center-aligned and classified as "alert" and "warning"
+~a|w> center-aligned and classified as "alert" and "warning"
+~aw|> center-aligned and classified as "alert" and "warning"
+
+=f2c> classified as "framed", "type-2" and "caution" in a wrapper
+=:f2c> left-aligned and classified as "framed", "type-2" and "caution" in a wrapper
+=f2c:> right-aligned and classified as "framed", "type-2" and "caution" in a wrapper
+=:f2c:> justify-aligned and classified as "framed", "type-2" and "caution" in a wrapper
+=|f2c> center-aligned and classified as "framed", "type-2" and "caution" in a wrapper
+=f|2c> center-aligned and classified as "framed", "type-2" and "caution" in a wrapper
+=f2|c> center-aligned and classified as "framed", "type-2" and "caution" in a wrapper
+=f2c|> center-aligned and classified as "framed", "type-2" and "caution" in a wrapper
+```
+
+## Dictionary
+
+```javascript
+{
+  a: "alert",
+  b: "blue",
+  c: "caution",
+  d: "danger",
+  e: "error",
+  f: "framed",
+  g: "green",
+  h: "horizontal",
+  i: "info",
+  j: undefined,
+  k: undefined,
+  l: undefined,
+  m: undefined,
+  n: "note",
+  o: undefined,
+  p: undefined,
+  q: undefined,
+  r: "red",
+  s: "success",
+  t: "tip",
+  u: undefined,
+  v: "verticle",
+  w: "warning",
+  x: undefined,
+  y: "yellow",
+  z: undefined,
+  "0": "type-0",
+  "1": "type-1",
+  "2": "type-2",
+  "3": "type-3",
+  "4": "type-4",
+  "5": "type-5",
+  "6": "type-6",
+  "7": "type-7",
+  "8": "type-8",
+  "9": "type-9",
+};
 ```
 
 ## Options
@@ -82,22 +200,49 @@ All options are optional and have default values.
 
 ```javascript
 use(remarkFlexibleParagraphs, {
-
-})
+  dictionary?: Dictionary; // optional, default is represented above
+  paragraphClassName?: string; // optional, default is "flexible-paragraph"
+  paragraphClassificationPrefix?: string; // optional, default is "flexiparaph"
+  wrapperTagName: string, // optional, default is "div"
+  wrapperClassName: string, // optional, default is "flexible-paragraph-wrapper"
+  wrapperProperties: (align?: "center" | "left" | "right", classifications?: string[]) => Record<string, unknown>, // optional, default is undefined
+});
 ```
 
-#### `xxxx`
+#### `dictionary`
 
-It is a **string** option for providing custom HTML tag name for the `xxxx` node other than `xxx`.
+It is an **key, value** option for providing custom classification value for the `paragraph` node. If you provide `dictionary: {w: "white"}`, it overrides to the only `w` key, and the value would be "white" instead of default one "warning".
 
+#### `paragraphClassName`
+
+It is a **string** option for providing custom className for the `paragraph` node other than `flexible-paragraph`.
+
+#### `paragraphClassificationPrefix`
+
+It is a **string** option for providing custom classification prefix for the `paragraph` node other than `flexiparaph`.
+
+#### `wrapperTagName`
+
+It is a **string** option for providing custom HTML tag name for the `wrapper` node other than `div`.
+
+#### `wrapperClassName`
+
+It is a **string** option for providing custom className for the `wrapper` node other than `flexible-paragraph-wrapper`.
+
+#### `wrapperProperties`
+
+It is an option to set additional properties for the `wrapper` node. It is a callback function that takes the `align` and the `classifications` as optional arguments and returns the object which is going to be used for adding additional properties into the `wrapper` node. If you input for example as `=:aw:`, the param `align` would be `"justify"` and the `classifications` would be `["alert", "warning"]`.
 
 ## Examples:
 
 ```markdown
-???
+~> Standard flexible paragraph
+=:a:> Alert paragraph centered in a wrapper
+~:s> Success paragraph aligned left
+=|> Centered paragraph in a wrapper
 ```
 
-#### Without any options
+#### Without any option
 
 ```javascript
 use(remarkFlexibleParagraphs);
@@ -106,8 +251,68 @@ use(remarkFlexibleParagraphs);
 is going to produce as default:
 
 ```html
-???
+<p class="flexible-paragraph">Standard flexible paragraph</p>
+<div class="flexible-paragraph-wrapper">
+  <p
+    class="flexible-paragraph flexiparaph-alert flexiparaph-align-justify"
+    style="text-align:justify"
+  >
+    Alert paragraph justified in a wrapper
+  </p>
+</div>
+<p
+  class="flexible-paragraph flexiparaph-success flexiparaph-align-left"
+  style="text-align:left"
+>
+  Success paragraph aligned left
+</p>
+<div class="flexible-paragraph-wrapper">
+  <p class="flexible-paragraph flexiparaph-align-center" style="text-align:center">
+    Centered paragraph in a wrapper
+  </p>
+</div>
 ```
+
+#### With options
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  dictionary: {
+    s: "solid",
+  },
+  paragraphClassName: "custom-paragraph",
+  paragraphClassificationPrefix: "paraflex",
+  wrapperTagName: "section",
+  wrapperClassName: "custom-paragraph-wrapper",
+  wrapperProperties(align, classifications) {
+    return {
+      ["data-align"]: align,
+      ["data-classifications"]: classifications,
+    };
+  },
+});
+```
+
+is going to produce:
+
+```html
+<p class="custom-paragraph">Standard flexible paragraph</p>
+<section class="custom-paragraph-wrapper" data-align="justify" data-classifications="alert">
+  <p class="custom-paragraph paraflex-alert paraflex-align-justify" style="text-align:justify">
+    Alert paragraph justified in a wrapper
+  </p>
+</section>
+<p class="custom-paragraph paraflex-solid paraflex-align-left" style="text-align:left">
+  Success paragraph aligned left
+</p>
+<section class="custom-paragraph-wrapper" data-align="center">
+  <p class="custom-paragraph paraflex-align-center" style="text-align:center">
+    Centered paragraph in a wrapper
+  </p>
+</section>
+```
+
+For detailed examples, you can have a look at the test files in the github repo.
 
 ## Syntax tree
 
@@ -115,7 +320,7 @@ This plugin only modifies the mdast (markdown abstract syntax tree) as explained
 
 ## Types
 
-This package is fully typed with [TypeScript][typeScript]. The plugin options' type is exported as `???`.
+This package is fully typed with [TypeScript][typeScript]. The plugin options' type is exported as `FlexibleParagraphOptions`.
 
 ## Compatibility
 
