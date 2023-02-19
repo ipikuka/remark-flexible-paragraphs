@@ -6,10 +6,8 @@ import { u } from "unist-builder";
 
 type Property = {
   type: "wrapper" | "paragraph";
-  properties: {
-    align?: "center" | "left" | "right";
-    className?: string[];
-  };
+  align?: "center" | "left" | "right" | "justify";
+  className?: string[];
 };
 
 type PhrasingContents = PhrasingContent[];
@@ -57,30 +55,30 @@ type Dictionary = Partial<Record<Keys, string>>;
 
 const dictionary: Dictionary = {
   a: "alert",
-  b: "boring",
+  b: "blue",
   c: "caution",
   d: "danger",
   e: "error",
-  f: "flex",
-  g: "grid",
+  f: "framed",
+  g: "green",
   h: "horizontal",
   i: "info",
-  j: "justify",
+  j: undefined,
   k: undefined,
-  l: "left",
+  l: undefined,
   m: undefined,
   n: "note",
   o: undefined,
   p: undefined,
   q: undefined,
-  r: "right",
+  r: "red",
   s: "success",
   t: "tip",
   u: undefined,
   v: "verticle",
   w: "warning",
   x: undefined,
-  y: undefined,
+  y: "yellow",
   z: undefined,
   "0": "type-0",
   "1": "type-1",
@@ -95,7 +93,7 @@ const dictionary: Dictionary = {
 };
 
 type TPropertyFunction = (
-  align?: "center" | "left" | "right",
+  align?: "center" | "left" | "right" | "justify",
   classifications?: string[],
 ) => Record<string, unknown>;
 
@@ -111,7 +109,7 @@ export type FlexibleParagraphOptions = {
 const DEFAULT_SETTINGS: FlexibleParagraphOptions = {
   dictionary,
   paragraphClassName: "flexible-paragraph",
-  paragraphClassificationPrefix: "flexigraph",
+  paragraphClassificationPrefix: "flexiparaph",
   wrapperTagName: "div",
   wrapperClassName: "flexible-paragraph-wrapper",
   wrapperProperties: undefined,
@@ -122,55 +120,13 @@ export const REGEX_GLOBAL = /([~=])(:)?([a-z0-9]*\|?[a-z0-9]*)?(:)?>\s*/g;
 
 /**
  *
- * This plugin turns a paragraph into a flexible paragraph or splits a paragraph, with optional wrapper and customizable classifications
+ * This plugin turns a paragraph into a flexible paragraph or splits it as a flexible paragraph,
+ * with optional wrapper, customizable classifications and customizable alignment
  *
  * for example:
  *
- * ~> with no classification and no alignment
- * => in a wrapper with no classification and no alignment
- *
- * =|> center-aligned in a wrapper with no classification
- * =:|> left-aligned in a wrapper with no classification
- * =|:> right-aligned in a wrapper with no classification
- * =::> center-aligned in a wrapper with no classification
- *
- * ~s> classified as "success" with no alignment
- * ~s|> center-aligned and classified as "success"
- * ~|s> center-aligned and classified as "success"
- * ~:s:> center-aligned and classified as "success"
- * ~:s> left-aligned and classified as "success"
- * ~s:> right-aligned and classified as "success"
- *
- * ~w> classified as "warning" with no alignment
- * ~d> classified as "danger" with no alignment
- * ~i> classified as "info" with no alignment
- * ~n> classified as "note" with no alignment
- * ~t> classified as "tip" with no alignment
- *
- * ~gw> classified as "grid" and "warning" with no alignment
- * ~gw:> right-aligned and classified as "grid" and "warning"
- * ~:gw> left-aligned and classified as "grid" and "warning"
- * ~:gw:> center-aligned and classified as "grid" and "warning"
- * ~|gw> center-aligned and classified as "grid" and "warning"
- * ~g|w> center-aligned and classified as "grid" and "warning"
- * ~gw|> center-aligned and classified as "grid" and "warning"
- *
- * =:g2c> left-aligned and classified as "grid", "type-2" and "caution" in a wrapper
- * =g2c:> right-aligned and classified as "grid", "type-2" and "caution" in a wrapper
- * =:g2c:> center-aligned and classified as "grid", "type-2" and "caution" in a wrapper
- * =|g2c> center-aligned and classified as "grid", "type-2" and "caution" in a wrapper
- * =g|2c> center-aligned and classified as "grid", "type-2" and "caution" in a wrapper
- * =g2|c> center-aligned and classified as "grid", "type-2" and "caution" in a wrapper
- * =g2c|> center-aligned and classified as "grid", "type-2" and "caution" in a wrapper
- *
- * The way of the usage (it is easy)
- * 1. choose the marker   a) "~>" for paragraph   b) "=>" for paragraph with wrapper
- * 2. put the marker "~>" or "=>" in the first column always in the beginning of the paragraph or where the flexible paragraph begins
- * 3. choose a character or characters from the dictionary [a-z0-9] (only lowercase and numbers), each has a predefined but customizable value
- * 4. put the letter(s) into middle of the marker
- * 5. it has no alignment by default, if you want to center it, use a pipe "|" or double colon "::"; the pipe "|" takes precedence
- * 6. if you want to align left or right use a colon ":" at one of the side; if colons at both sides that means center
- * 7. if there is no classification, but want to align left or right, use the colon with the pipe ":|" for left or "|:" for right
+ * ~> I am a flexible paragraph
+ * => I am a flexible paragraph wrapped in a div
  *
  */
 export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
@@ -187,12 +143,13 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
    */
   const constructWrapper = (
     paragraph: Paragraph,
-    properties: Property["properties"],
+    align: Property["align"],
+    className: Property["className"],
   ): Parent => {
     const classifications: string[] = [];
 
     // extract the classifications from the className array
-    properties.className?.forEach((c, i) => {
+    className?.forEach((c, i) => {
       // it is assumed that the first className is the pragraph className which is not a classification
       if (i !== 0) {
         if (settings.paragraphClassificationPrefix) {
@@ -206,7 +163,7 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
     let _properties: Record<string, unknown> | undefined;
 
     if (settings.wrapperProperties) {
-      _properties = settings.wrapperProperties(properties.align, classifications);
+      _properties = settings.wrapperProperties(align, classifications);
 
       Object.entries(_properties).forEach(([k, v]) => {
         if ((typeof v === "string" && v === "") || (Array.isArray(v) && v.length === 0)) {
@@ -289,32 +246,31 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
     } as const;
 
     const type: Property["type"] = markers[marker as keyof typeof markers];
-
-    const properties: Property["properties"] = {
-      align: "center",
-      className: className ? [className] : [],
-    };
+    const classNames: Property["className"] = className ? [className] : [];
+    let align: Property["align"] = undefined;
 
     if (!left && !right) {
-      properties.align = undefined;
+      align = undefined;
     } else if (left && right) {
-      properties.align = "center";
+      align = "justify";
     } else if (left) {
-      properties.align = "left";
+      align = "left";
     } else if (right) {
-      properties.align = "right";
+      align = "right";
     }
 
     if (classes?.includes("|")) {
-      properties.align = "center";
+      align = "center";
     }
 
     if (classes === "|") {
-      properties.align = "center";
-    } else if (classes === ":|") {
-      properties.align = "left";
-    } else if (classes === "|:") {
-      properties.align = "right";
+      if (left && right) {
+        align = "justify";
+      } else if (left) {
+        align = "left";
+      } else if (right) {
+        align = "right";
+      }
     }
 
     if (classes) {
@@ -323,13 +279,13 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
           const name = dictionary?.[char as Keys];
 
           if (name) {
-            properties.className?.push(prefix ? `${prefix}-${name}` : name);
+            classNames?.push(prefix ? `${prefix}-${name}` : name);
           }
         }
       });
     }
 
-    return { type, properties };
+    return { type, align, className: classNames };
   }
 
   /**
@@ -435,15 +391,36 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
       const paragraph = u("paragraph", phrasingContents) as Paragraph;
 
       if (propertyMatrix[i]) {
+        const className: string[] = [];
+
+        propertyMatrix[i].className?.forEach((c) => {
+          className.push(c);
+        });
+
+        const alignment = propertyMatrix[i].align
+          ? settings.paragraphClassificationPrefix
+            ? `${settings.paragraphClassificationPrefix}-align-${propertyMatrix[i].align}`
+            : `align-${propertyMatrix[i].align}`
+          : undefined;
+
+        if (alignment) className.push(alignment);
+
         paragraph.data = {
-          hProperties: propertyMatrix[i].properties,
+          hProperties: {
+            className,
+            style: propertyMatrix[i].align
+              ? `text-align:${propertyMatrix[i].align}`
+              : undefined,
+          },
         };
       }
 
       if (propertyMatrix[i]?.type === "wrapper") {
-        const wrapper = constructWrapper(paragraph, {
-          ...propertyMatrix[i].properties,
-        });
+        const wrapper = constructWrapper(
+          paragraph,
+          propertyMatrix[i].align,
+          propertyMatrix[i].className,
+        );
 
         paragraphs.push(wrapper);
       } else {
