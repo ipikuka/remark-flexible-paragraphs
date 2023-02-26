@@ -13,7 +13,7 @@ This package is a [unified][unified] ([remark][remark]) plugin to add custom par
 
 ## When should I use this?
 
-This plugin is useful if you want to **add a custom paragraph** in markdown, _with alignment support, custom class name, custom classifications, and also additional properties_. This plugin also give an option to wrap the paragraph with a container. **You can easily center or align the paragraphs with the `remark-flexible-paragraphs` plugin.**
+This plugin is useful if you want to **add a custom paragraph** in markdown, _with alignment support, custom class name, custom classifications, and also additional properties_. This plugin also give an option to wrap the paragraph with a container. **You can easily center or align the paragraphs with the `remark-flexible-paragraphs`.**
 
 ## Installation
 
@@ -98,12 +98,11 @@ Without `remark-flexible-paragraphs`, you’d get:
 9. if you want **to align it to right**, use a colon **`:`** at the right side
 10. if you want **to justify it**, use a colon **`:`** at both sides
 11. if there is no classification, but want to align it, use the colon with the pipe:
-
-- use **`:|`** for **left alignment**
-- use **`|:`** for **right alignment**
-- use **`:|:`** for **justify alignment**
-- use **`::`** for **justify alignment**
-- use **`|`** for **center alignment**
+   - for **left alignment** use **`:|`**
+   - for **right alignment** use **`|:`**
+   - for **justify alignment** use **`:|:`**
+   - for **justify alignment** use **`::`**
+   - for **center alignment** use **`|`**
 
 ```markdown
 ~> paragraph with no classification and no alignment
@@ -231,14 +230,14 @@ It is a **string** option for providing custom className for the `wrapper` node 
 
 #### `wrapperProperties`
 
-It is an option to set additional properties for the `wrapper` node. It is a callback function that takes the `align` and the `classifications` as optional arguments and returns the object which is going to be used for adding additional properties into the `wrapper` node. If you input for example as `=:aw:`, the param `align` would be `"justify"` and the `classifications` would be `["alert", "warning"]`.
+It is an option to set additional properties for the `wrapper` node. It is a callback function that takes the `align` and the `classifications` as optional arguments and returns the object which is going to be used for adding additional properties into the `wrapper` node. If you input for example as `=:aw:>`, the param `align` would be `"justify"` and the `classifications` would be `["alert", "warning"]`.
 
 ## Examples:
 
 ```markdown
 ~> Standard flexible paragraph
-=:a:> Alert paragraph centered in a wrapper
-~:s> Success paragraph aligned left
+=:a:> Alert paragraph justified in a wrapper
+~:s> Success paragraph left-aligned
 =|> Centered paragraph in a wrapper
 ```
 
@@ -264,7 +263,7 @@ is going to produce as default:
   class="flexible-paragraph flexiparaph-success flexiparaph-align-left"
   style="text-align:left"
 >
-  Success paragraph aligned left
+  Success paragraph left-aligned
 </p>
 <div class="flexible-paragraph-wrapper">
   <p class="flexible-paragraph flexiparaph-align-center" style="text-align:center">
@@ -303,7 +302,7 @@ is going to produce:
   </p>
 </section>
 <p class="custom-paragraph paraflex-solid paraflex-align-left" style="text-align:left">
-  Success paragraph aligned left
+  Success paragraph left-aligned
 </p>
 <section class="custom-paragraph-wrapper" data-align="center">
   <p class="custom-paragraph paraflex-align-center" style="text-align:center">
