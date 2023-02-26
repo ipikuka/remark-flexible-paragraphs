@@ -2,6 +2,7 @@ import { unified, type Processor } from "unified";
 import remarkParse from "remark-parse";
 import gfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
+import rehypeFormat from "rehype-format";
 import rehypeStringify from "rehype-stringify";
 import dedent from "dedent";
 import type { VFileCompatible } from "vfile";
@@ -27,6 +28,7 @@ const compiler: Processor = unified()
     },
   })
   .use(remarkRehype)
+  .use(rehypeFormat)
   .use(rehypeStringify);
 
 const process = async (contents: VFileCompatible): Promise<VFileCompatible> => {
@@ -52,15 +54,23 @@ describe("no options - fail", () => {
     `;
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p>-> content</p>
-      <p>~_> content
-      ~ç> content
-      ~A> content</p>
-      <p>~dg::> content
-      ~::dg> content</p>
-      <p>~:::> content
-      ~::|> content
-      ~|::> content</p>"
+      "
+      <p>-> content</p>
+      <p>
+        ~_> content
+        ~ç> content
+        ~A> content
+      </p>
+      <p>
+        ~dg::> content
+        ~::dg> content
+      </p>
+      <p>
+        ~:::> content
+        ~::|> content
+        ~|::> content
+      </p>
+      "
     `);
   });
 });
@@ -76,10 +86,16 @@ describe("with options - success", () => {
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(`
-      "<p class="custom-paragraph">Standard flexible paragraph</p>
-      <section class="custom-paragraph-wrapper" data-align="justify" data-classifications="alert"><p class="custom-paragraph paraflex-alert paraflex-align-justify" style="text-align:justify">Alert paragraph justified in a wrapper</p></section>
+      "
+      <p class="custom-paragraph">Standard flexible paragraph</p>
+      <section class="custom-paragraph-wrapper" data-align="justify" data-classifications="alert">
+        <p class="custom-paragraph paraflex-alert paraflex-align-justify" style="text-align:justify">Alert paragraph justified in a wrapper</p>
+      </section>
       <p class="custom-paragraph paraflex-solid paraflex-align-left" style="text-align:left">Success paragraph aligned left</p>
-      <section class="custom-paragraph-wrapper" data-align="center"><p class="custom-paragraph paraflex-align-center" style="text-align:center">Centered paragraph in a wrapper</p></section>"
+      <section class="custom-paragraph-wrapper" data-align="center">
+        <p class="custom-paragraph paraflex-align-center" style="text-align:center">Centered paragraph in a wrapper</p>
+      </section>
+      "
     `);
   });
 });
