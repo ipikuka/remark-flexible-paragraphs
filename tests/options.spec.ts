@@ -20,9 +20,9 @@ const compiler = unified()
     paragraphClassificationPrefix: "paraflex",
     wrapperTagName: "section",
     wrapperClassName: "custom-paragraph-wrapper",
-    wrapperProperties(align, classifications) {
+    wrapperProperties(alignment, classifications) {
       return {
-        ["data-align"]: align,
+        ["data-alignment"]: alignment,
         ["data-classifications"]: classifications,
       };
     },
@@ -88,11 +88,11 @@ describe("with options - success", () => {
     expect(await process(input)).toMatchInlineSnapshot(`
       "
       <p class="custom-paragraph">Standard flexible paragraph</p>
-      <section class="custom-paragraph-wrapper" data-align="justify" data-classifications="alert">
+      <section class="custom-paragraph-wrapper" data-alignment="justify" data-classifications="alert">
         <p class="custom-paragraph paraflex-alert paraflex-align-justify" style="text-align:justify">Alert paragraph justified in a wrapper</p>
       </section>
       <p class="custom-paragraph paraflex-solid paraflex-align-left" style="text-align:left">Success paragraph aligned left</p>
-      <section class="custom-paragraph-wrapper" data-align="center">
+      <section class="custom-paragraph-wrapper" data-alignment="center">
         <p class="custom-paragraph paraflex-align-center" style="text-align:center">Centered paragraph in a wrapper</p>
       </section>
       "
