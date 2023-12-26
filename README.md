@@ -17,7 +17,7 @@ This plugin is useful if you want to **add a custom paragraph** in markdown, _wi
 
 ## Installation
 
-This package is suitable for ESM only. In Node.js (version 14.14+, 16.0+), install with npm:
+This package is suitable for ESM only. In Node.js (version 16+), install with npm:
 
 ```bash
 npm install remark-flexible-paragraphs
@@ -195,17 +195,27 @@ Without `remark-flexible-paragraphs`, you’d get:
 
 ## Options
 
-All options are optional and have default values.
+All options are **optional** and have **defaultvalues**.
 
 ```javascript
-use(remarkFlexibleParagraphs, {
-  dictionary?: Dictionary; // optional, default is represented above
-  paragraphClassName?: string; // optional, default is "flexible-paragraph"
-  paragraphClassificationPrefix?: string; // optional, default is "flexiparaph"
-  wrapperTagName: string, // optional, default is "div"
-  wrapperClassName: string, // optional, default is "flexible-paragraph-wrapper"
-  wrapperProperties: (align?: "center" | "left" | "right", classifications?: string[]) => Record<string, unknown>, // optional, default is undefined
-});
+/* the type definitions in the package
+type Dictionary = Partial<Record<Keys, string>>;
+type Alignment = "center" | "left" | "right" | "justify";
+type PropertyFunction = (alignment?: Alignment, classifications?: string[]) => Record<string,unknown>;
+*/
+
+// create flexible paragraph options object
+const flexibleParagraphOptions: FlexibleParagraphOptions = {
+  dictionary?: Dictionary; // default is represented above
+  paragraphClassName?: string; // default is "flexible-paragraph"
+  paragraphClassificationPrefix?: string; // default is "flexiparaph"
+  wrapperTagName?: string; // default is "div"
+  wrapperClassName?: string; // default is "flexible-paragraph-wrapper"
+  wrapperProperties?: PropertyFunction; // default is undefined
+};
+
+// use these options like below
+use(remarkFlexibleParagraphs, flexibleParagraphOptions)
 ```
 
 #### `dictionary`
@@ -214,23 +224,23 @@ It is an **key, value** option for providing custom classification value for the
 
 #### `paragraphClassName`
 
-It is a **string** option for providing custom className for the `paragraph` node other than `flexible-paragraph`.
+It is a **string** option for providing custom className for the `paragraph` node other than default `flexible-paragraph`.
 
 #### `paragraphClassificationPrefix`
 
-It is a **string** option for providing custom classification prefix for the `paragraph` node other than `flexiparaph`.
+It is a **string** option for providing custom classification prefix for the `paragraph` node other than default `flexiparaph`.
 
 #### `wrapperTagName`
 
-It is a **string** option for providing custom HTML tag name for the `wrapper` node other than `div`.
+It is a **string** option for providing custom HTML tag name for the `wrapper` node other than default `div`.
 
 #### `wrapperClassName`
 
-It is a **string** option for providing custom className for the `wrapper` node other than `flexible-paragraph-wrapper`.
+It is a **string** option for providing custom className for the `wrapper` node other than default `flexible-paragraph-wrapper`.
 
 #### `wrapperProperties`
 
-It is an option to set additional properties for the `wrapper` node. It is a callback function that takes the `align` and the `classifications` as optional arguments and returns the object which is going to be used for adding additional properties into the `wrapper` node. If you input for example as `=:aw:>`, the param `align` would be `"justify"` and the `classifications` would be `["alert", "warning"]`.
+It is an option to set additional properties for the `wrapper` node. It is a callback function that takes the `alignment` and the `classifications` as optional arguments and returns the object which is going to be used for adding additional properties into the `wrapper` node. If you input for example as `=:aw:>`, the param `alignment` would be `"justify"` and the `classifications` would be `["alert", "warning"]`.
 
 ## Examples:
 
@@ -283,9 +293,9 @@ use(remarkFlexibleParagraphs, {
   paragraphClassificationPrefix: "paraflex",
   wrapperTagName: "section",
   wrapperClassName: "custom-paragraph-wrapper",
-  wrapperProperties(align, classifications) {
+  wrapperProperties(alignment, classifications) {
     return {
-      ["data-align"]: align,
+      ["data-alignment"]: alignment,
       ["data-classifications"]: classifications,
     };
   },
@@ -296,7 +306,7 @@ is going to produce:
 
 ```html
 <p class="custom-paragraph">Standard flexible paragraph</p>
-<section class="custom-paragraph-wrapper" data-align="justify" data-classifications="alert">
+<section class="custom-paragraph-wrapper" data-alignment="justify" data-classifications="alert">
   <p class="custom-paragraph paraflex-alert paraflex-align-justify" style="text-align:justify">
     Alert paragraph justified in a wrapper
   </p>
@@ -304,7 +314,7 @@ is going to produce:
 <p class="custom-paragraph paraflex-solid paraflex-align-left" style="text-align:left">
   Success paragraph left-aligned
 </p>
-<section class="custom-paragraph-wrapper" data-align="center">
+<section class="custom-paragraph-wrapper" data-alignment="center">
   <p class="custom-paragraph paraflex-align-center" style="text-align:center">
     Centered paragraph in a wrapper
   </p>
