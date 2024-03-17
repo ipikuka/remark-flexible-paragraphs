@@ -496,7 +496,7 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
       }
     });
 
-    if (nodes.length) parent.children.splice(index!, 1, ...nodes);
+    if (nodes.length) parent.children.splice(index, 1, ...nodes);
   };
 
   const transformer: Transformer<Root> = (tree) => {
