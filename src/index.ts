@@ -193,11 +193,16 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
     const classnames: string[] = [];
 
     classifications.forEach((classification) => {
-      classnames.push(`${settings.paragraphClassificationPrefix}-${classification}`);
+      settings.paragraphClassificationPrefix === ""
+        ? classnames.push(`${classification}`)
+        : classnames.push(`${settings.paragraphClassificationPrefix}-${classification}`);
     });
 
-    alignment &&
-      classnames.push(`${settings.paragraphClassificationPrefix}-align-${alignment}`);
+    if (alignment) {
+      settings.paragraphClassificationPrefix === ""
+        ? classnames.push(`align-${alignment}`)
+        : classnames.push(`${settings.paragraphClassificationPrefix}-align-${alignment}`);
+    }
 
     const paragraphClassName =
       typeof settings.paragraphClassName === "function"

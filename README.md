@@ -16,7 +16,7 @@ This package is a [unified][unified] ([remark][remark]) plugin to add custom par
 
 ## When should I use this?
 
-This plugin is useful if you want to **add a custom paragraph** in markdown, _with alignment support, custom class name, custom classifications, and also additional properties_. This plugin also give an option to wrap the paragraph with a container. **You can easily center or align the paragraphs with the `remark-flexible-paragraphs`.**
+This plugin is useful if you want to **add a custom paragraph** in markdown, _with alignment support, custom class names, custom classifications, and also additional properties_. This plugin also give an option to wrap the paragraph with a container. **You can easily center or align the paragraphs with the `remark-flexible-paragraphs`.**
 
 ## Installation
 
@@ -36,9 +36,9 @@ yarn add remark-flexible-paragraphs
 
 #### ~> [paragraph content]
 
-#### => [paragraph content wrapped in a container]
+#### => [paragraph content to be wrapped in a container]
 
-Say we have the following file, `example.md`, which consists a flexible paragraph.
+Say we have the following file, `example.md`, which consists some flexible paragraphs.
 
 ```markdown
 I am a normal paragraph
@@ -93,7 +93,7 @@ Without `remark-flexible-paragraphs`, you’d get:
 1. choose the marker: **`~>`** for paragraph; **`=>`** for paragraph in a wrapper
 2. put the marker **`~>`** or **`=>`** where the flexible paragraph begins
 3. choose the character(s) from the dictionary **`[a-z0-9]` (only lowercase and numbers)** for classification
-4. each dictionary key has a predefined but customizable classification value (some are `undefined` yet)
+4. each dictionary key has a predefined but customizable classification value
 5. put the character(s) into middle of the marker **(in order to add classification)**
 6. it has no alignment by default
 7. if you want **to center it**, use a pipe **`|`**
@@ -153,10 +153,44 @@ Without `remark-flexible-paragraphs`, you’d get:
 =f2c|> center-aligned and classified as "framed", "type-2" and "caution" in a wrapper
 ```
 
-## Dictionary
+## Options
+
+All options are **optional** and have **default values**.
 
 ```javascript
-{
+type Alignment = "center" | "left" | "right" | "justify";
+type RestrictedRecord = Record<string, unknown> & { className?: never };
+
+type Dictionary = Partial<Record<Key, string>>;
+type TagNameFunction = (alignment?: Alignment, classifications?: string[]) => string;
+type ClassNameFunction = (alignment?: Alignment, classifications?: string[]) => string[];
+type PropertyFunction = (alignment?: Alignment, classifications?: string[]) => RestrictedRecord;
+
+use(remarkFlexibleParagraphs, {
+  dictionary?: Dictionary; // explained in the options section
+  paragraphClassName?: string | ClassNameFunction; // default is "flexible-paragraph"
+  paragraphProperties?: PropertyFunction;
+  paragraphClassificationPrefix?: string; // default is "flexiparaph"
+  wrapperTagName?: string | TagNameFunction; // default is "div"
+  wrapperClassName?: string | ClassNameFunction; // default is "flexible-paragraph-wrapper"
+  wrapperProperties?: PropertyFunction;
+} as FlexibleParagraphOptions)
+```
+
+#### `dictionary`
+
+It is a **key, value** option for providing **custom classification** for the `paragraph` node. 
+
+The dictionary is opinionated, by default.
+
+```typescript
+type Key = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" 
+         | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+         | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+
+type Dictionary = Partial<Record<Key, string>>;
+
+const dictionary: Dictionary = {
   a: "alert",
   b: "blue",
   c: "caution",
@@ -196,54 +230,277 @@ Without `remark-flexible-paragraphs`, you’d get:
 };
 ```
 
-## Options
-
-All options are **optional** and have **default values**.
+**You can override the dictionary entries.**
 
 ```javascript
-/* the type definitions in the package
-type Dictionary = Partial<Record<Key, string>>;
-type Alignment = "center" | "left" | "right" | "justify";
-type PropertyFunction = (alignment?: Alignment, classifications?: string[]) => Record<string,unknown>;
-*/
-
-// create flexible paragraph options object
-const flexibleParagraphOptions: FlexibleParagraphOptions = {
-  dictionary?: Dictionary; // default is represented above
-  paragraphClassName?: string; // default is "flexible-paragraph"
-  paragraphClassificationPrefix?: string; // default is "flexiparaph"
-  wrapperTagName?: string; // default is "div"
-  wrapperClassName?: string; // default is "flexible-paragraph-wrapper"
-  wrapperProperties?: PropertyFunction; // default is undefined
-};
-
-// use these options like below
-use(remarkFlexibleParagraphs, flexibleParagraphOptions)
+use(remarkFlexibleParagraphs, {
+  dictionary: {
+    w: "white"
+  },
+});
 ```
 
-#### `dictionary`
+Now, it is overriden for only `w` key, and the classification will be `white` instead of default one `warning`.
 
-It is an **key, value** option for providing custom classification value for the `paragraph` node. If you provide `dictionary: {w: "white"}`, it overrides to the only `w` key, and the value would be "white" instead of default one "warning".
+```markdown
+~w> paragraph content
+```
+
+```html
+<p class="flexible-paragraph flexiparaph-white">paragraph content</p>
+```
 
 #### `paragraphClassName`
 
-It is a **string** option for providing custom className for the `paragraph` node other than default `flexible-paragraph`.
+It is a **string** or a **callback** `(alignment?: Alignment, classifications?: string[]) => string[]` option for providing custom class name for the `paragraph` node. 
+
+By default, it is `flexible-paragraph`, and all paragraphs' classnames will contain `flexible-paragraph`.
+
+A flexible paragraph node contains also **secondary class names** representing the **specification** and/or **alignment** which starts with the prefix `flexiparaph-`, like `flexiparaph-alert` or `flexiparaph-warning` or `flexiparaph-align-center`. If there is no classification or alignment, then the secondary class name will not take place.
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  paragraphClassName: "remark-paragraph",
+});
+```
+
+Now, the paragraph nodes will contain `remark-paragraph` as a className.
+
+```markdown
+~> content
+=> content in a container
+```
+
+```html
+<p class="remark-paragraph">content</p>
+<div class="...">
+  <p class="remark-paragraph">content in a container</p>
+</div>
+```
+
+The option can take also a callback function, which has two optional arguments `alignment` and `classifications`, and returns **array of strings** representing **class names**. For example, if the input contains `~:a> content`, the parameter `alignment` would be `"left"` and the `classifications` would be `["alert"]`.
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  paragraphClassName: (alignment, classifications) => {
+    return [
+      "custom-paragraph",
+      ...(classifications ? classifications : []),
+      ...(alignment ? [alignment] : []),
+    ];
+  },
+});
+```
+
+Now, the element class names **will contain class names** like `custom-paragraph`, `custom-paragraph alert center` etc.
+
+```markdown
+~> content
+~a> content
+~|> content
+```
+
+```html
+<p class="custom-paragraph">content</p>
+<p class="custom-paragraph alert">content</p>
+<p class="custom-paragraph center" style="text-align:center">content</p>
+```
+
+> [!WARNING]
+> **If you use the `paragraphClassName` option as a callback function, it is your responsibility to define class names, primary or secondary in an array.**
 
 #### `paragraphClassificationPrefix`
 
-It is a **string** option for providing custom classification prefix for the `paragraph` node other than default `flexiparaph`.
+It is a **string** option for providing classification prefix for the `paragraph` node.
+
+By default, it is `flexiparaph`.
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  paragraphClassificationPrefix: "",
+});
+```
+
+Now, the paragraph class name **will not take the prefix for the classifications and alignment.**.
+
+```markdown
+~> content
+~a> content
+~|> content
+```
+
+```html
+<p class="flexible-paragraph">content</p>
+<p class="flexible-paragraph alert">content</p>
+<p class="flexible-paragraph align-center" style="text-align:center">content</p>
+```
+
+#### `paragraphProperties`
+
+It is a **callback** `(alignment?: Alignment, classifications?: string[]) => Record<string, unknown> & { className?: never }` option to set additional properties for the `paragraph` node.
+
+The callback function that takes `alignment` and `classifications` as optional arguments and returns **object** which is going to be used for adding additional properties into the `paragraph` node. For example, if the input contains `~:a> content`, the parameter `alignment` would be `"left"` and the `classifications` would be `["alert"]`.
+
+**The `className` key is forbidden and effectless in the returned object.**
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  paragraphProperties(alignment, classifications) {
+    return {
+      title: classifications,
+      ["data-align"]: alignment,
+    };
+  },
+});
+```
+
+Now, the paragraph nodes which have a classification will contain `title` property, which have an alignment will contain `data-align` property.
+
+```markdown
+~> content
+~a:> content
+```
+
+```html
+<p class="...">content</p>
+<p class="..." title="alert" data-align="right">content</p>
+```
 
 #### `wrapperTagName`
 
-It is a **string** option for providing custom HTML tag name for the `wrapper` node other than default `div`.
+It is a **string** or a **callback** `(alignment?: Alignment, classifications?: string[]) => string` option for providing custom HTML tag name for the `wrapper` nodes.
+
+By default, it is `div` which is well known HTML element for containers and wrappers.
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  wrapperTagName: "section",
+});
+```
+
+Now, the wrapper tag names will be `section`.
+
+```html
+<section class="...">
+  <p class="flexible-paragraph">content</p>
+</section>
+```
+
+The option can take also a callback function, which has optional arguments `alignment` and `classifications`, and returns **string** representing the **custom tag name**. For example, if the input contains `=a> content`, the parameter `alignment` would be `undefined` and the `classifications` would be `["alert"]`.
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  wrapperTagName: (alignment, classifications) => {
+    return classifications?.includes("alert") ? "section" : "div"
+  },
+});
+```
+
+Now, the element tag names will be the color name.
+
+```markdown
+=> content
+=a> content
+```
+
+```html
+<div class="...">
+  <p class="flexible-paragraph">content</p>
+</div>
+<section class="...">
+  <p class="flexible-paragraph flexiparaph-alert">content</p>
+</section>
+```
 
 #### `wrapperClassName`
 
-It is a **string** option for providing custom className for the `wrapper` node other than default `flexible-paragraph-wrapper`.
+It is a **string** or a **callback** `(alignment?: Alignment, classifications?: string[]) => string[]` option for providing custom class name for the `wrapper` node. 
+
+By default, it is `flexible-paragraph-wrapper`, and all wrappers' classnames will contain `flexible-paragraph-wrapper`.
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  wrapperClassName: "remark-wrapper",
+});
+```
+
+Now, the wrapper nodes will contain `remark-wrapper` as a className.
+
+```markdown
+=a> content in a wrapper
+```
+
+```html
+<div class="remark-wrapper">
+  <p class="...">content in a wrapper</p>
+</div>
+```
+
+The option can take also a callback function, which has two optional arguments `alignment` and `classifications`, and returns **array of strings** representing **class names**. For example, if the input contains `=w:> content`, the parameter `alignment` would be `"right"` and the `classifications` would be `["warning"]`.
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  wrapperClassName: (alignment, classifications) => {
+    return alignment 
+      ? [`custom-paragraph-${alignment}`]
+      : [ "custom-paragraph"];
+  },
+});
+```
+
+Now, the wrapper class names **will contain a class name** like `custom-paragraph`, `custom-paragraph-center` etc.
+
+```markdown
+=> content
+=|> content
+```
+
+```html
+<div class="custom-paragraph">
+  <p class="...">content</p>
+</div>
+<div class="custom-paragraph-center">
+  <p class="..." style="text-align:center">content</p>
+</div>
+```
+
+> [!WARNING]
+> **If you use the `wrapperClassName` option as a callback function, it is your responsibility to define class names, primary or secondary in an array.**
 
 #### `wrapperProperties`
 
-It is an option to set additional properties for the `wrapper` node. It is a callback function that takes the `alignment` and the `classifications` as optional arguments and returns the object which is going to be used for adding additional properties into the `wrapper` node. If you input for example as `=:aw:>`, the param `alignment` would be `"justify"` and the `classifications` would be `["alert", "warning"]`.
+It is a **callback** `(alignment?: Alignment, classifications?: string[]) => Record<string, unknown> & { className?: never }` option to set additional properties for the `wrapper` node.
+
+The callback function that takes `alignment` and `classifications` as optional arguments and returns **object** which is going to be used for adding additional properties into the `wrapper` node. For example, if the input contains `=:aw:> content`, the parameter `alignment` would be `"justify"` and the `classifications` would be `["alert", "warning"]`.
+
+**The `className` key is forbidden and effectless in the returned object.**
+
+```javascript
+use(remarkFlexibleParagraphs, {
+  wrapperProperties(alignment, classifications) {
+    return {
+      title: classifications,
+      ["data-align"]: alignment,
+    };
+  },
+});
+```
+
+Now, the wrapper nodes which have a classification will contain `title` property, which have an alignment will contain `data-align` property.
+
+```markdown
+=> content
+=a:> content
+```
+
+```html
+<div class="...">
+  <p class="...">content</p>
+</div>
+<div class="..." title="alert" data-align="right">
+  <p class="...">content</p>
+</div>
+```
 
 ## Examples:
 
@@ -336,7 +593,7 @@ This package is fully typed with [TypeScript][typescript]. The plugin options' t
 
 ## Compatibility
 
-This plugin works with unified version 6+ and remark version 7+. It is compatible with mdx version.2.
+This plugin works with `unified` version 6+ and `remark` version 7+. It is compatible with `mdx` version 2+.
 
 ## Security
 
@@ -381,7 +638,7 @@ I like to contribute the Unified / Remark / MDX ecosystem, so I recommend you to
 
 ### Keywords
 
-[unified][unifiednpm] [remark][remarknpm] [remark plugin][remarkpluginnpm] [mdast][mdastnpm] [markdown][markdownnpm] [remark paragraph][remarkparagraphnpm]
+🟩 [unified][unifiednpm] 🟩 [remark][remarknpm] 🟩 [remark plugin][remarkpluginnpm] 🟩 [mdast][mdastnpm] 🟩 [markdown][markdownnpm] 🟩 [remark paragraph][remarkparagraphnpm]
 
 [unifiednpm]: https://www.npmjs.com/search?q=keywords:unified
 [remarknpm]: https://www.npmjs.com/search?q=keywords:remark

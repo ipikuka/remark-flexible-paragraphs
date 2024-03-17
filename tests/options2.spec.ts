@@ -8,16 +8,16 @@ const options: FlexibleParagraphOptions = {
     s: "solid",
   },
   paragraphClassName: (alignment, classifications) => {
-    return classifications
+    return classifications && classifications.length
       ? [`remark-${classifications?.join("-")}-paragraph`, alignment ?? ""]
       : ["remark-paragraph", alignment ?? ""];
   },
-  paragraphClassificationPrefix: "paraflex",
+  paragraphClassificationPrefix: "",
   wrapperTagName: (alignment, classifications) => {
     return classifications?.includes("alert") ? "alert" : "div";
   },
   wrapperClassName: (alignment, classifications) => {
-    return classifications
+    return classifications && classifications.length
       ? [`remark-${classifications?.join("-")}-wrapper`]
       : ["remark-wrapper"];
   },
@@ -75,13 +75,13 @@ describe("with options - success", () => {
 
     expect(await process(input, options)).toMatchInlineSnapshot(`
       "
-      <p class="remark--paragraph">Standard flexible paragraph</p>
+      <p class="remark-paragraph">Standard flexible paragraph</p>
       <alert class="remark-alert-wrapper">
         <p class="remark-alert-paragraph justify" style="text-align:justify">Alert paragraph justified in a wrapper</p>
       </alert>
       <p class="remark-solid-paragraph left" style="text-align:left">Success paragraph aligned left</p>
-      <div class="remark--wrapper">
-        <p class="remark--paragraph center" style="text-align:center">Centered paragraph in a wrapper</p>
+      <div class="remark-wrapper">
+        <p class="remark-paragraph center" style="text-align:center">Centered paragraph in a wrapper</p>
       </div>
       "
     `);
