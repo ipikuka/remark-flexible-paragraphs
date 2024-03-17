@@ -1,14 +1,16 @@
 # remark-flexible-paragraphs
 
-[![NPM version][npm-image]][npm-url]
-[![Build][github-build]][github-build-url]
+[![NPM version][badge-npm-version]][npm-package-url]
+[![NPM downloads][badge-npm-download]][npm-package-url]
+[![Build][badge-build]][github-workflow-url]
+[![codecov](https://codecov.io/gh/ipikuka/remark-flexible-paragraphs/graph/badge.svg?token=DB491JPTDO)](https://codecov.io/gh/ipikuka/remark-flexible-paragraphs)
 [![type-coverage](https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fipikuka%2Fremark-flexible-paragraphs%2Fmaster%2Fpackage.json)](https://github.com/ipikuka/remark-flexible-paragraphs)
 [![typescript][badge-typescript]][typescript-url]
 [![License][badge-license]][github-license-url]
 
-This package is a [unified][unified] ([remark][remark]) plugin to add custom paragraphs in a flexible way (compatible with new parser "[micromark][micromark]").
+This package is a [unified][unified] ([remark][remark]) plugin to add custom paragraphs with customizable properties in markdown.
 
-"**unified**" is a project that transforms content with abstract syntax trees (ASTs). "**remark**" adds support for markdown to unified. "**mdast**" is the markdown abstract syntax tree (AST) that remark uses.
+**[unified][unified]** is a project that transforms content with abstract syntax trees (ASTs) using the new parser **[micromark][micromark]**. **[remark][remark]** adds support for markdown to unified. **[mdast][mdast]** is the Markdown Abstract Syntax Tree (AST) which is a specification for representing markdown in a syntax tree.
 
 **This plugin is a remark plugin that transforms the mdast.**
 
@@ -330,7 +332,7 @@ This plugin only modifies the mdast (markdown abstract syntax tree) as explained
 
 ## Types
 
-This package is fully typed with [TypeScript][typeScript]. The plugin options' type is exported as `FlexibleParagraphOptions`.
+This package is fully typed with [TypeScript][typescript]. The plugin options' type is exported as `FlexibleParagraphOptions`.
 
 ## Compatibility
 
@@ -340,19 +342,38 @@ This plugin works with unified version 6+ and remark version 7+. It is compatibl
 
 Use of `remark-flexible-paragraphs` does not involve rehype (hast) or user content so there are no openings for cross-site scripting (XSS) attacks.
 
-## My Remark Plugins
+## My Plugins
 
-The remark packages I have published are presented below:
-+ [`remark-flexible-code-titles`](https://www.npmjs.com/package/remark-flexible-code-titles)
+I like to contribute the Unified / Remark / MDX ecosystem, so I recommend you to have a look my plugins.
+
+### My Remark Plugins
+
+- [`remark-flexible-code-titles`](https://www.npmjs.com/package/remark-flexible-code-titles)
   – Remark plugin to add titles or/and containers for the code blocks with customizable properties
-+ [`remark-flexible-containers`](https://www.npmjs.com/package/remark-flexible-containers)
+- [`remark-flexible-containers`](https://www.npmjs.com/package/remark-flexible-containers)
   – Remark plugin to add custom containers with customizable properties in markdown
-+ [`remark-flexible-paragraphs`](https://www.npmjs.com/package/remark-flexible-paragraphs)
-  – Remark plugin to add custom paragraphs with customizable properties in markdown
-+ [`remark-flexible-paragraphs`](https://www.npmjs.com/package/remark-flexible-paragraphs)
-  – Remark plugin to add custom `mark` element with customizable properties in markdown
-+ [`remark-ins`](https://www.npmjs.com/package/remark-ins)
+- [`remark-ins`](https://www.npmjs.com/package/remark-ins)
   – Remark plugin to add `ins` element in markdown
+- [`remark-flexible-paragraphs`](https://www.npmjs.com/package/remark-flexible-paragraphs)
+  – Remark plugin to add custom paragraphs with customizable properties in markdown
+- [`remark-flexible-paragraphs`](https://www.npmjs.com/package/remark-flexible-paragraphs)
+  – Remark plugin to add custom `mark` element with customizable properties in markdown
+- [`remark-flexible-toc`](https://www.npmjs.com/package/remark-flexible-toc)
+  – Remark plugin to expose the table of contents via Vfile.data or via an option reference
+- [`remark-mdx-remove-esm`](https://www.npmjs.com/package/remark-mdx-remove-esm)
+  – Remark plugin to remove import and/or export statements (mdxjsEsm)
+
+### My Rehype Plugins
+
+- [`rehype-pre-language`](https://www.npmjs.com/package/rehype-pre-language)
+  – Rehype plugin to add language information as a property to `pre` element
+
+### My Recma Plugins
+
+- [`recma-mdx-escape-missing-components`](https://www.npmjs.com/package/recma-mdx-escape-missing-components)
+  – Recma plugin to set the default value `() => null` for the Components in MDX in case of missing or not provided so as not to throw an error
+- [`recma-mdx-change-props`](https://www.npmjs.com/package/recma-mdx-change-props)
+  – Recma plugin to change the `props` parameter into the `_props` in the `function _createMdxContent(props) {/* */}` in the compiled source in order to be able to use `{props.foo}` like expressions. It is useful for the `next-mdx-remote` or `next-mdx-remote-client` users in `nextjs` applications.
 
 ## License
 
@@ -360,28 +381,31 @@ The remark packages I have published are presented below:
 
 ### Keywords
 
-[unified][unifiednpm] [remark][remarknpm] [remark-plugin][remarkpluginnpm] [mdast][mdastnpm] [markdown][markdownnpm] [remark custom paragraphs][remarkCustomParagraphsnpm]
+[unified][unifiednpm] [remark][remarknpm] [remark plugin][remarkpluginnpm] [mdast][mdastnpm] [markdown][markdownnpm] [remark paragraph][remarkparagraphnpm]
 
-[unified]: https://github.com/unifiedjs/unified
 [unifiednpm]: https://www.npmjs.com/search?q=keywords:unified
-[remark]: https://github.com/remarkjs/remark
 [remarknpm]: https://www.npmjs.com/search?q=keywords:remark
 [remarkpluginnpm]: https://www.npmjs.com/search?q=keywords:remark%20plugin
-[mdast]: https://github.com/syntax-tree/mdast
 [mdastnpm]: https://www.npmjs.com/search?q=keywords:mdast
-[micromark]: https://github.com/micromark/micromark
-[rehypeprismplus]: https://github.com/timlrx/rehype-prism-plus
-[typescript]: https://www.typescriptlang.org/
 [markdownnpm]: https://www.npmjs.com/search?q=keywords:markdown
-[remarkCustomParagraphsnpm]: https://www.npmjs.com/search?q=keywords:remark%20custom%20paragraph
-[npm-url]: https://www.npmjs.com/package/remark-flexible-paragraphs
-[npm-image]: https://img.shields.io/npm/v/remark-flexible-paragraphs
-[github-build]: https://github.com/ipikuka/remark-flexible-paragraphs/actions/workflows/publish.yml/badge.svg
-[github-build-url]: https://github.com/ipikuka/remark-flexible-paragraphs/actions/workflows/publish.yml
-[npm-typescript]: https://img.shields.io/npm/types/remark-flexible-paragraphs
+[remarkparagraphnpm]: https://www.npmjs.com/search?q=keywords:remark%20paragraph
+
+[unified]: https://github.com/unifiedjs/unified
+[remark]: https://github.com/remarkjs/remark
+[remarkplugins]: https://github.com/remarkjs/remark/blob/main/doc/plugins.md
+[mdast]: https://github.com/syntax-tree/mdast
+[micromark]: https://github.com/micromark/micromark
+[typescript]: https://www.typescriptlang.org/
+
+[badge-npm-version]: https://img.shields.io/npm/v/remark-flexible-paragraphs
+[badge-npm-download]:https://img.shields.io/npm/dt/remark-flexible-paragraphs
+[npm-package-url]: https://www.npmjs.com/package/remark-flexible-paragraphs
 
 [badge-license]: https://img.shields.io/github/license/ipikuka/remark-flexible-paragraphs
 [github-license-url]: https://github.com/ipikuka/remark-flexible-paragraphs/blob/main/LICENSE
+
+[badge-build]: https://github.com/ipikuka/remark-flexible-paragraphs/actions/workflows/publish.yml/badge.svg
+[github-workflow-url]: https://github.com/ipikuka/remark-flexible-paragraphs/actions/workflows/publish.yml
 
 [badge-typescript]: https://img.shields.io/npm/types/remark-flexible-paragraphs
 [typescript-url]: https://www.typescriptlang.org/
