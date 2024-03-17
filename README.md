@@ -3,7 +3,7 @@
 [![NPM version][badge-npm-version]][npm-package-url]
 [![NPM downloads][badge-npm-download]][npm-package-url]
 [![Build][badge-build]][github-workflow-url]
-[![codecov](https://codecov.io/gh/ipikuka/remark-flexible-paragraphs/graph/badge.svg?token=DB491JPTDO)](https://codecov.io/gh/ipikuka/remark-flexible-paragraphs)
+[![codecov](https://codecov.io/gh/ipikuka/remark-flexible-paragraphs/graph/badge.svg?token=MD4FTZUA1W)](https://codecov.io/gh/ipikuka/remark-flexible-paragraphs)
 [![type-coverage](https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fipikuka%2Fremark-flexible-paragraphs%2Fmaster%2Fpackage.json)](https://github.com/ipikuka/remark-flexible-paragraphs)
 [![typescript][badge-typescript]][typescript-url]
 [![License][badge-license]][github-license-url]
