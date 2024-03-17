@@ -1,7 +1,6 @@
 import { visit, EXIT, type Visitor, type VisitorResult } from "unist-util-visit";
 import type { Plugin, Transformer } from "unified";
-import type { Node, Parent } from "unist";
-import type { Paragraph, PhrasingContent, Root, Text } from "mdast";
+import type { Data, Node, Paragraph, Parent, PhrasingContent, Root, Text } from "mdast";
 import { u } from "unist-builder";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -9,6 +8,29 @@ type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type PartiallyRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
+interface WrapperData extends Data {}
+
+interface Wrapper extends Parent {
+  /**
+   * Node type of mdast Mark.
+   */
+  type: "wrapper";
+  /**
+   * Children of paragraph.
+   */
+  children: [Paragraph];
+  /**
+   * Data associated with the mdast paragraph.
+   */
+  data?: WrapperData | undefined;
+}
+
+declare module "mdast" {
+  interface RootContentMap {
+    wrapper: Wrapper;
+  }
+}
 
 type Alignment = "center" | "left" | "right" | "justify";
 type Kind = "wrapper" | "paragraph";
@@ -222,7 +244,7 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
     paragraph: Paragraph,
     classifications: string[],
     alignment?: Alignment,
-  ): Parent => {
+  ): Wrapper => {
     const wrapperTagName =
       typeof settings.wrapperTagName === "string"
         ? settings.wrapperTagName
@@ -380,7 +402,7 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
 
     if (!isTarget) return;
 
-    const nodes: Array<Paragraph | Parent> = [];
+    const nodes: Array<Paragraph | Wrapper> = [];
     const phrasesMatrix: PhrasingContent[][] = [[]];
     const flexibleNodes: FlexibleNode[] = [];
     let matrixIndex = 0;
