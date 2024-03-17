@@ -426,7 +426,7 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
             const match = matches[idx];
 
             const [matched, marker, left, classes, right] = match;
-            const mIndex = match.index ?? 0;
+            const mIndex = match.index;
             const mLength = matched.length;
 
             // if it is the first match but the marker index is not first
