@@ -56,7 +56,6 @@ describe("no options - success", () => {
   it("standart usage without classification and alignment", async () => {
     const input = dedent(`
       ~> standard
-
     `);
 
     expect(await process(input)).toMatchInlineSnapshot(
@@ -67,10 +66,10 @@ describe("no options - success", () => {
   // ******************************************
   it("only catches the exact marker", async () => {
     const input = dedent`
-        ~~> content
+      ~~> content
 
-        =~> content
-      `;
+      =~> content
+    `;
 
     expect(await process(input)).toMatchInlineSnapshot(`
       "<p>~</p>

@@ -163,23 +163,23 @@ Without `remark-flexible-paragraphs`, you’d get:
   g: "green",
   h: "horizontal",
   i: "info",
-  j: undefined,
-  k: undefined,
-  l: undefined,
-  m: undefined,
+  j: "jumbo",
+  k: "kindle",
+  l: "lokum",
+  m: "menu",
   n: "note",
-  o: undefined,
-  p: undefined,
-  q: undefined,
+  o: "ordinary",
+  p: "pack",
+  q: "quantity",
   r: "red",
   s: "success",
   t: "tip",
-  u: undefined,
+  u: "unified",
   v: "verticle",
   w: "warning",
-  x: undefined,
+  x: "xray",
   y: "yellow",
-  z: undefined,
+  z: "zigzag",
   "0": "type-0",
   "1": "type-1",
   "2": "type-2",
@@ -195,11 +195,11 @@ Without `remark-flexible-paragraphs`, you’d get:
 
 ## Options
 
-All options are **optional** and have **defaultvalues**.
+All options are **optional** and have **default values**.
 
 ```javascript
 /* the type definitions in the package
-type Dictionary = Partial<Record<Keys, string>>;
+type Dictionary = Partial<Record<Key, string>>;
 type Alignment = "center" | "left" | "right" | "justify";
 type PropertyFunction = (alignment?: Alignment, classifications?: string[]) => Record<string,unknown>;
 */
