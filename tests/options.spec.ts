@@ -1,49 +1,33 @@
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import gfm from "remark-gfm";
-import remarkRehype from "remark-rehype";
-import rehypeFormat from "rehype-format";
-import rehypeStringify from "rehype-stringify";
 import dedent from "dedent";
-import type { VFileCompatible } from "vfile";
 
-import plugin from "../src";
+import { type FlexibleParagraphOptions } from "../src";
+import { process } from "./util/index";
 
-const compiler = unified()
-  .use(remarkParse)
-  .use(gfm)
-  .use(plugin, {
-    dictionary: {
-      s: "solid",
-    },
-    paragraphClassName: "custom-paragraph",
-    paragraphProperties(alignment, classifications) {
-      return {
-        title: classifications,
-        dummy: "", // shouldn't be added
-        empty: [], // shouldn't be added
-        className: undefined, // shouldn't be taken account
-      };
-    },
-    paragraphClassificationPrefix: "paraflex",
-    wrapperTagName: "section",
-    wrapperClassName: "custom-paragraph-wrapper",
-    wrapperProperties(alignment, classifications) {
-      return {
-        ["data-alignment"]: alignment,
-        ["data-classifications"]: classifications,
-        dummy: "", // shouldn't be added
-        empty: [], // shouldn't be added
-        className: undefined, // shouldn't be taken account
-      };
-    },
-  })
-  .use(remarkRehype)
-  .use(rehypeFormat)
-  .use(rehypeStringify);
-
-const process = async (contents: VFileCompatible): Promise<VFileCompatible> => {
-  return compiler.process(contents).then((file) => file.value);
+const options: FlexibleParagraphOptions = {
+  dictionary: {
+    s: "solid",
+  },
+  paragraphClassName: "custom-paragraph",
+  paragraphProperties(alignment, classifications) {
+    return {
+      title: classifications,
+      dummy: "", // shouldn't be added
+      empty: [], // shouldn't be added
+      className: undefined, // shouldn't be taken account
+    };
+  },
+  paragraphClassificationPrefix: "paraflex",
+  wrapperTagName: "section",
+  wrapperClassName: "custom-paragraph-wrapper",
+  wrapperProperties(alignment, classifications) {
+    return {
+      ["data-alignment"]: alignment,
+      ["data-classifications"]: classifications,
+      dummy: "", // shouldn't be added
+      empty: [], // shouldn't be added
+      className: undefined, // shouldn't be taken account
+    };
+  },
 };
 
 describe("no options - fail", () => {
@@ -64,7 +48,7 @@ describe("no options - fail", () => {
       ~|::> content
     `;
 
-    expect(await process(input)).toMatchInlineSnapshot(`
+    expect(await process(input, options)).toMatchInlineSnapshot(`
       "
       <p>-> content</p>
       <p>
@@ -96,7 +80,7 @@ describe("with options - success", () => {
       =|> Centered paragraph in a wrapper
     `);
 
-    expect(await process(input)).toMatchInlineSnapshot(`
+    expect(await process(input, options)).toMatchInlineSnapshot(`
       "
       <p class="custom-paragraph">Standard flexible paragraph</p>
       <section class="custom-paragraph-wrapper" data-alignment="justify" data-classifications="alert">
