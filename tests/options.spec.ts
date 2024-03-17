@@ -17,6 +17,11 @@ const compiler = unified()
       s: "solid",
     },
     paragraphClassName: "custom-paragraph",
+    paragraphProperties(alignment, classifications) {
+      return {
+        title: classifications,
+      };
+    },
     paragraphClassificationPrefix: "paraflex",
     wrapperTagName: "section",
     wrapperClassName: "custom-paragraph-wrapper",
@@ -89,9 +94,9 @@ describe("with options - success", () => {
       "
       <p class="custom-paragraph">Standard flexible paragraph</p>
       <section class="custom-paragraph-wrapper" data-alignment="justify" data-classifications="alert">
-        <p class="custom-paragraph paraflex-alert paraflex-align-justify" style="text-align:justify">Alert paragraph justified in a wrapper</p>
+        <p class="custom-paragraph paraflex-alert paraflex-align-justify" title="alert" style="text-align:justify">Alert paragraph justified in a wrapper</p>
       </section>
-      <p class="custom-paragraph paraflex-solid paraflex-align-left" style="text-align:left">Success paragraph aligned left</p>
+      <p class="custom-paragraph paraflex-solid paraflex-align-left" title="solid" style="text-align:left">Success paragraph aligned left</p>
       <section class="custom-paragraph-wrapper" data-alignment="center">
         <p class="custom-paragraph paraflex-align-center" style="text-align:center">Centered paragraph in a wrapper</p>
       </section>

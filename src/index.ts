@@ -4,17 +4,23 @@ import type { Node, Parent } from "unist";
 import type { Paragraph, PhrasingContent, Root, Text } from "mdast";
 import { u } from "unist-builder";
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type Prettify<T> = { [K in keyof T]: T[K] } & {};
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type PartiallyRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
 type Alignment = "center" | "left" | "right" | "justify";
 type Kind = "wrapper" | "paragraph";
 
 type FlexibleNode = {
   type: Kind;
   alignment?: Alignment;
-  classNames?: string[];
+  classifications: string[];
 };
 
 // satisfies the regex [a-z0-9]
-type Keys =
+type Key =
   | "a"
   | "b"
   | "c"
@@ -52,7 +58,7 @@ type Keys =
   | "8"
   | "9";
 
-type Dictionary = Partial<Record<Keys, string>>;
+type Dictionary = Partial<Record<Key, string>>;
 
 const dictionary: Dictionary = {
   a: "alert",
@@ -64,23 +70,23 @@ const dictionary: Dictionary = {
   g: "green",
   h: "horizontal",
   i: "info",
-  j: undefined,
-  k: undefined,
-  l: undefined,
-  m: undefined,
+  j: "jumbo",
+  k: "kindle",
+  l: "lokum",
+  m: "menu",
   n: "note",
-  o: undefined,
-  p: undefined,
-  q: undefined,
+  o: "ordinary",
+  p: "pack",
+  q: "quantity",
   r: "red",
   s: "success",
   t: "tip",
-  u: undefined,
+  u: "unified",
   v: "verticle",
   w: "warning",
-  x: undefined,
+  x: "xray",
   y: "yellow",
-  z: undefined,
+  z: "zigzag",
   "0": "type-0",
   "1": "type-1",
   "2": "type-2",
@@ -93,17 +99,18 @@ const dictionary: Dictionary = {
   "9": "type-9",
 };
 
-type PropertyFunction = (
-  alignment?: Alignment,
-  classifications?: string[],
-) => Record<string, unknown>;
+type RestrictedRecord = Record<string, unknown> & { className?: never };
+type TagNameFunction = (alignment?: Alignment, classifications?: string[]) => string;
+type ClassNameFunction = (alignment?: Alignment, classifications?: string[]) => string[];
+type PropertyFunction = (alignment?: Alignment, classifications?: string[]) => RestrictedRecord;
 
 export type FlexibleParagraphOptions = {
   dictionary?: Dictionary;
-  paragraphClassName?: string;
+  paragraphClassName?: string | ClassNameFunction;
+  paragraphProperties?: PropertyFunction;
   paragraphClassificationPrefix?: string;
-  wrapperTagName?: string;
-  wrapperClassName?: string;
+  wrapperTagName?: string | TagNameFunction;
+  wrapperClassName?: string | ClassNameFunction;
   wrapperProperties?: PropertyFunction;
 };
 
@@ -113,8 +120,18 @@ const DEFAULT_SETTINGS: FlexibleParagraphOptions = {
   paragraphClassificationPrefix: "flexiparaph",
   wrapperTagName: "div",
   wrapperClassName: "flexible-paragraph-wrapper",
-  wrapperProperties: undefined,
 };
+
+type PartiallyRequiredFlexibleParagraphOptions = Prettify<
+  PartiallyRequired<
+    FlexibleParagraphOptions,
+    | "dictionary"
+    | "paragraphClassName"
+    | "paragraphClassificationPrefix"
+    | "wrapperTagName"
+    | "wrapperClassName"
+  >
+>;
 
 export const REGEX = /([~=])(:)?([a-z0-9]*\|?[a-z0-9]*)?(:)?>\s*/;
 export const REGEX_GLOBAL = /([~=])(:)?([a-z0-9]*\|?[a-z0-9]*)?(:)?>\s*/g;
@@ -131,11 +148,70 @@ export const REGEX_GLOBAL = /([~=])(:)?([a-z0-9]*\|?[a-z0-9]*)?(:)?>\s*/g;
  *
  */
 export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
-  const settings = Object.assign({}, DEFAULT_SETTINGS, options);
+  const settings = Object.assign(
+    {},
+    DEFAULT_SETTINGS,
+    options,
+  ) as PartiallyRequiredFlexibleParagraphOptions;
 
   if (options?.dictionary && Object.keys(options.dictionary).length) {
     settings.dictionary = Object.assign({}, dictionary, options.dictionary);
   }
+
+  /**
+   *
+   * constracts the paragraph node
+   *
+   */
+  const constructParagraph = (
+    phrasingContents: PhrasingContent[],
+    classifications: string[],
+    alignment?: Alignment,
+  ): Paragraph => {
+    const classnames: string[] = [];
+
+    classifications.forEach((classification) => {
+      classnames.push(`${settings.paragraphClassificationPrefix}-${classification}`);
+    });
+
+    alignment &&
+      classnames.push(`${settings.paragraphClassificationPrefix}-align-${alignment}`);
+
+    const paragraphClassName =
+      typeof settings.paragraphClassName === "function"
+        ? settings.paragraphClassName(alignment, classifications)
+        : [settings.paragraphClassName, ...classnames];
+
+    let properties: Record<string, unknown> | undefined;
+
+    if (settings.paragraphProperties) {
+      properties = settings.paragraphProperties(alignment, classifications);
+
+      Object.entries(properties).forEach(([k, v]) => {
+        if (
+          (typeof v === "string" && v === "") ||
+          (Array.isArray(v) && (v as unknown[]).length === 0)
+        ) {
+          properties && (properties[k] = undefined);
+        }
+
+        if (k === "className") delete properties?.["className"];
+      });
+    }
+
+    return {
+      type: "paragraph",
+      children: phrasingContents,
+      data: {
+        hName: "p",
+        hProperties: {
+          className: paragraphClassName,
+          ...(properties && { ...properties }),
+          style: alignment ? `text-align:${alignment}` : undefined,
+        },
+      },
+    };
+  };
 
   /**
    *
@@ -144,34 +220,33 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
    */
   const constructWrapper = (
     paragraph: Paragraph,
+    classifications: string[],
     alignment?: Alignment,
-    classNames?: string[],
   ): Parent => {
-    const classifications: string[] = [];
+    const wrapperTagName =
+      typeof settings.wrapperTagName === "string"
+        ? settings.wrapperTagName
+        : settings.wrapperTagName(alignment, classifications);
 
-    // extract the classifications from the className array
-    classNames?.forEach((className, i) => {
-      // it is assumed that the first className is the pragraph className which is not a classification
-      if (i !== 0) {
-        if (settings.paragraphClassificationPrefix) {
-          classifications.push(
-            className.slice(settings.paragraphClassificationPrefix.length + 1),
-          ); // +1 for the dash
-        } else {
-          classifications.push(className);
-        }
-      }
-    });
+    const wrapperClassName =
+      typeof settings.wrapperClassName === "function"
+        ? settings.wrapperClassName(alignment, classifications)
+        : [settings.wrapperClassName];
 
-    let _properties: Record<string, unknown> | undefined;
+    let properties: Record<string, unknown> | undefined;
 
     if (settings.wrapperProperties) {
-      _properties = settings.wrapperProperties(alignment, classifications);
+      properties = settings.wrapperProperties(alignment, classifications);
 
-      Object.entries(_properties).forEach(([k, v]) => {
-        if ((typeof v === "string" && v === "") || (Array.isArray(v) && v.length === 0)) {
-          _properties && (_properties[k] = undefined);
+      Object.entries(properties).forEach(([k, v]) => {
+        if (
+          (typeof v === "string" && v === "") ||
+          (Array.isArray(v) && (v as unknown[]).length === 0)
+        ) {
+          properties && (properties[k] = undefined);
         }
+
+        if (k === "className") delete properties?.["className"];
       });
     }
 
@@ -179,10 +254,10 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
       type: "wrapper",
       children: [paragraph],
       data: {
-        hName: settings.wrapperTagName,
+        hName: wrapperTagName,
         hProperties: {
-          className: [settings.wrapperClassName],
-          ...(_properties && { ..._properties }),
+          className: wrapperClassName,
+          ...(properties && { ...properties }),
         },
       },
     };
@@ -270,21 +345,17 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
 
     const type = markers[marker as keyof typeof markers];
     const alignment = _alignment;
-    const classNames = settings.paragraphClassName ? [settings.paragraphClassName] : [];
-
-    if (classes) {
-      Array.from(classes).forEach((char) => {
-        if (char !== "|") {
-          const name = settings.dictionary?.[char as Keys];
-
-          if (name) {
-            classNames?.push(`${settings.paragraphClassificationPrefix!}-${name}`);
+    const classifications = classes
+      ? Array.from(classes).reduce((list, char) => {
+          if (char !== "|") {
+            const name = settings.dictionary[char as Key];
+            if (name) list.push(name);
           }
-        }
-      });
-    }
+          return list;
+        }, [] as string[])
+      : [];
 
-    return { type, alignment, classNames };
+    return { type, alignment, classifications };
   }
 
   /**
@@ -298,11 +369,12 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
 
   /**
    *
-   * visits the paragraphs
+   * visits the Paragraph nodes
    *
    */
-  const visitor: Visitor<Paragraph> = function (node, index, parent): VisitorResult {
-    if (!parent) return;
+  const visitor: Visitor<Paragraph, Parent> = function (node, index, parent): VisitorResult {
+    /* istanbul ignore next */
+    if (!parent || typeof index === "undefined") return;
 
     const isTarget = checkIsTarget(node);
 
@@ -331,8 +403,9 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
           for (let idx = 0; idx < matches.length; idx++) {
             const match = matches[idx];
 
+            const [matched, marker, left, classes, right] = match;
             const mIndex = match.index ?? 0;
-            const mLength = match[0].length;
+            const mLength = matched.length;
 
             // if it is the first match but the marker index is not first
             if (idx === 0 && mIndex !== 0) {
@@ -344,7 +417,7 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
               }
             }
 
-            // do not increase index if the marker is in the first phrase in the beginning
+            // do not increase matrixIndex if the marker is in the first phrase in the beginning
             if (idx !== 0 || mIndex !== 0) matrixIndex++;
 
             const textValue =
@@ -354,18 +427,13 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
                 : // if it is NOT the last match
                   value.substring(mIndex + mLength, matches[idx + 1].index);
 
-            // console.log({ textValue });
-
             if (textValue) {
               const text = u("text", textValue) as Text;
               phrasesMatrix[matrixIndex] = insert(phrasesMatrix[matrixIndex], text);
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const [input, marker, left, classes, right] = match;
-
             flexibleNodes[matrixIndex] = getFlexibleNode({
-              marker,
+              marker, // "=" or "~"
               left,
               classes,
               right,
@@ -375,45 +443,29 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
       }
     }
 
-    phrasesMatrix.forEach((phrasingContents, i) => {
-      // clean the newline and spaces at the last phrase (if Text)
+    // clean the newline and spaces at the last phrases (if Text) of each flexible paragraph
+    phrasesMatrix.forEach((phrasingContents) => {
       const lastPhrase = phrasingContents[phrasingContents.length - 1];
       if (lastPhrase.type === "text") {
         lastPhrase.value = lastPhrase.value.replace(/[\s\r\n]+$/, "");
       }
+    });
 
-      const paragraph = u("paragraph", phrasingContents) as Paragraph;
-
-      if (flexibleNodes[i]) {
-        const classNames: string[] = [];
-
-        flexibleNodes[i].classNames?.forEach((className) => {
-          classNames.push(className);
-        });
-
-        const alignmentClassName = flexibleNodes[i].alignment
-          ? settings.paragraphClassificationPrefix
-            ? `${settings.paragraphClassificationPrefix}-align-${flexibleNodes[i].alignment}`
-            : `align-${flexibleNodes[i].alignment}`
-          : undefined;
-
-        if (alignmentClassName) classNames.push(alignmentClassName);
-
-        paragraph.data = {
-          hProperties: {
-            className: classNames,
-            style: flexibleNodes[i].alignment
-              ? `text-align:${flexibleNodes[i].alignment}`
-              : undefined,
-          },
-        };
-      }
+    // construct the flexible paragraphs whether in a wrapper or not
+    phrasesMatrix.forEach((phrasingContents, i) => {
+      const paragraph = flexibleNodes[i]
+        ? constructParagraph(
+            phrasingContents,
+            flexibleNodes[i].classifications,
+            flexibleNodes[i].alignment,
+          )
+        : (u("paragraph", phrasingContents) as Paragraph);
 
       if (flexibleNodes[i]?.type === "wrapper") {
         const wrapper = constructWrapper(
           paragraph,
+          flexibleNodes[i].classifications,
           flexibleNodes[i].alignment,
-          flexibleNodes[i].classNames,
         );
 
         nodes.push(wrapper);
