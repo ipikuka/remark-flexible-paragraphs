@@ -16,7 +16,7 @@ This package is a [unified][unified] ([remark][remark]) plugin to add custom par
 
 ## When should I use this?
 
-This plugin is useful if you want to **add a custom paragraph** in markdown, _with alignment support, custom class names, custom classifications, and also additional properties_. This plugin also give an option to wrap the paragraph with a container. **You can easily center or align the paragraphs with the `remark-flexible-paragraphs`.**
+This plugin is useful if you want to **add a custom paragraph** in markdown, _with alignment support, custom class names, custom classifications, and also additional properties_. This plugin also give an option to wrap the paragraph with a container. **You can easily center or align paragraphs with the `remark-flexible-paragraphs`.**
 
 ## Installation
 
@@ -34,9 +34,9 @@ yarn add remark-flexible-paragraphs
 
 ## Usage
 
-#### ~> [paragraph content]
+#### ~> paragraph content
 
-#### => [paragraph content to be wrapped in a container]
+#### => paragraph content to be wrapped in a container
 
 Say we have the following file, `example.md`, which consists some flexible paragraphs.
 
@@ -292,7 +292,7 @@ use(remarkFlexibleParagraphs, {
 });
 ```
 
-Now, the element class names **will contain class names** like `custom-paragraph`, `custom-paragraph alert center` etc.
+Now, the paragraph **will contain class names** like `custom-paragraph`, `custom-paragraph alert center` etc.
 
 ```markdown
 ~> content
@@ -313,7 +313,7 @@ Now, the element class names **will contain class names** like `custom-paragraph
 
 It is a **string** option for providing classification prefix for the `paragraph` node.
 
-By default, it is `flexiparaph`.
+By default, it is `flexiparaph`, which is added as a prefix like `flexiparaph-alert`, `flexiparaph-align-center` etc.
 
 ```javascript
 use(remarkFlexibleParagraphs, {
@@ -321,7 +321,7 @@ use(remarkFlexibleParagraphs, {
 });
 ```
 
-Now, the paragraph class name **will not take the prefix for the classifications and alignment.**.
+Now, the paragraph class name **will not take any prefix for the classifications and alignment**.
 
 ```markdown
 ~> content
@@ -370,7 +370,7 @@ Now, the paragraph nodes which have a classification will contain `title` proper
 
 It is a **string** or a **callback** `(alignment?: Alignment, classifications?: string[]) => string` option for providing custom HTML tag name for the `wrapper` nodes.
 
-By default, it is `div` which is well known HTML element for containers and wrappers.
+By default, it is `div` which is well known HTML element for containers.
 
 ```javascript
 use(remarkFlexibleParagraphs, {
