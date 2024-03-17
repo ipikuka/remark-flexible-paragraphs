@@ -48,7 +48,6 @@
     "@types/dedent": "^0.7.2",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.10.5",
-    "@types/unist": "^3.0.2",
     "@types/vfile": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
@@ -81,7 +80,6 @@
     "detail": true,
     "ignoreAsAssertion": true,
     "ignoreCatch": true,
-    "ignore-non-null-assertion": true,
     "strict": true
   }
 }
