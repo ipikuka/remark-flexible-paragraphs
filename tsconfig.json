@@ -1,5 +1,4 @@
 {
-  "include": ["src/**/*"],
   "compilerOptions": {
     "lib": ["ES2022"],
     "target": "ES2022",
@@ -12,5 +11,6 @@
     "sourceMap": true,
     "outDir": "dist/esm",
     "noImplicitReturns": true
-  }
+  },
+  "include": ["src/**/*"]
 }
