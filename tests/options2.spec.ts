@@ -1,42 +1,26 @@
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import gfm from "remark-gfm";
-import remarkRehype from "remark-rehype";
-import rehypeFormat from "rehype-format";
-import rehypeStringify from "rehype-stringify";
 import dedent from "dedent";
-import type { VFileCompatible } from "vfile";
 
-import plugin from "../src";
+import { type FlexibleParagraphOptions } from "../src";
+import { process } from "./util/index";
 
-const compiler = unified()
-  .use(remarkParse)
-  .use(gfm)
-  .use(plugin, {
-    dictionary: {
-      s: "solid",
-    },
-    paragraphClassName: (alignment, classifications) => {
-      return classifications
-        ? [`remark-${classifications?.join("-")}-paragraph`, alignment ?? ""]
-        : ["remark-paragraph", alignment ?? ""];
-    },
-    paragraphClassificationPrefix: "paraflex",
-    wrapperTagName: (alignment, classifications) => {
-      return classifications?.includes("alert") ? "alert" : "div";
-    },
-    wrapperClassName: (alignment, classifications) => {
-      return classifications
-        ? [`remark-${classifications?.join("-")}-wrapper`]
-        : ["remark-wrapper"];
-    },
-  })
-  .use(remarkRehype)
-  .use(rehypeFormat)
-  .use(rehypeStringify);
-
-const process = async (contents: VFileCompatible): Promise<VFileCompatible> => {
-  return compiler.process(contents).then((file) => file.value);
+const options: FlexibleParagraphOptions = {
+  dictionary: {
+    s: "solid",
+  },
+  paragraphClassName: (alignment, classifications) => {
+    return classifications
+      ? [`remark-${classifications?.join("-")}-paragraph`, alignment ?? ""]
+      : ["remark-paragraph", alignment ?? ""];
+  },
+  paragraphClassificationPrefix: "paraflex",
+  wrapperTagName: (alignment, classifications) => {
+    return classifications?.includes("alert") ? "alert" : "div";
+  },
+  wrapperClassName: (alignment, classifications) => {
+    return classifications
+      ? [`remark-${classifications?.join("-")}-wrapper`]
+      : ["remark-wrapper"];
+  },
 };
 
 describe("no options - fail", () => {
@@ -57,7 +41,7 @@ describe("no options - fail", () => {
       ~|::> content
     `;
 
-    expect(await process(input)).toMatchInlineSnapshot(`
+    expect(await process(input, options)).toMatchInlineSnapshot(`
       "
       <p>-> content</p>
       <p>
@@ -89,7 +73,7 @@ describe("with options - success", () => {
       =|> Centered paragraph in a wrapper
     `);
 
-    expect(await process(input)).toMatchInlineSnapshot(`
+    expect(await process(input, options)).toMatchInlineSnapshot(`
       "
       <p class="remark--paragraph">Standard flexible paragraph</p>
       <alert class="remark-alert-wrapper">
