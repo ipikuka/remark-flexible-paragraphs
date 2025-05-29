@@ -74,6 +74,9 @@
     "unist-builder": "^4.0.0",
     "unist-util-visit": "^5.0.0"
   },
+  "peerDependencies": {
+    "unified": "^11"
+  },
   "sideEffects": false,
   "typeCoverage": {
     "atLeast": 100,
