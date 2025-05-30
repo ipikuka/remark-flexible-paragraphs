@@ -400,7 +400,7 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
    *
    */
   const visitor: Visitor<Paragraph, Parent> = function (node, index, parent): VisitorResult {
-    /* istanbul ignore next */
+    /* v8 ignore next */
     if (!parent || typeof index === "undefined") return;
 
     const isTarget = checkIsTarget(node);

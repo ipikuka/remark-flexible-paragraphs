@@ -47,7 +47,6 @@
     "url": "https://github.com/ipikuka/remark-flexible-paragraphs/issues"
   },
   "devDependencies": {
-    "@types/dedent": "^0.7.2",
     "@types/node": "^22.15.24",
     "@types/vfile": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
