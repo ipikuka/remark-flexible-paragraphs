@@ -126,7 +126,7 @@ describe("no options - success", () => {
   });
 
   // ******************************************
-  it("one paragraph that multiple lines turn into seperate paragraph ", async () => {
+  it("one paragraph that multiple lines turn into seperate paragraph", async () => {
     const input = dedent(`
       =w:> hello
       **bold** with

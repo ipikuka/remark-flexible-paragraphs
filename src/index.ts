@@ -3,12 +3,11 @@ import type { Plugin, Transformer } from "unified";
 import type { Data, Node, Paragraph, Parent, PhrasingContent, Root, Text } from "mdast";
 import { u } from "unist-builder";
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type PartiallyRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface WrapperData extends Data {}
 
 interface Wrapper extends Parent {
@@ -193,15 +192,19 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
     const classnames: string[] = [];
 
     classifications.forEach((classification) => {
-      settings.paragraphClassificationPrefix === ""
-        ? classnames.push(`${classification}`)
-        : classnames.push(`${settings.paragraphClassificationPrefix}-${classification}`);
+      classnames.push(
+        settings.paragraphClassificationPrefix === ""
+          ? `${classification}`
+          : `${settings.paragraphClassificationPrefix}-${classification}`,
+      );
     });
 
     if (alignment) {
-      settings.paragraphClassificationPrefix === ""
-        ? classnames.push(`align-${alignment}`)
-        : classnames.push(`${settings.paragraphClassificationPrefix}-align-${alignment}`);
+      classnames.push(
+        settings.paragraphClassificationPrefix === ""
+          ? `align-${alignment}`
+          : `${settings.paragraphClassificationPrefix}-align-${alignment}`,
+      );
     }
 
     const paragraphClassName =
@@ -219,7 +222,9 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
           (typeof v === "string" && v === "") ||
           (Array.isArray(v) && (v as unknown[]).length === 0)
         ) {
-          properties && (properties[k] = undefined);
+          if (properties) {
+            properties[k] = undefined;
+          }
         }
 
         if (k === "className") delete properties?.["className"];
@@ -270,7 +275,9 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
           (typeof v === "string" && v === "") ||
           (Array.isArray(v) && (v as unknown[]).length === 0)
         ) {
-          properties && (properties[k] = undefined);
+          if (properties) {
+            properties[k] = undefined;
+          }
         }
 
         if (k === "className") delete properties?.["className"];
