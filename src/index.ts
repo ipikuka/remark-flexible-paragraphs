@@ -212,24 +212,18 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
         ? settings.paragraphClassName(alignment, classifications)
         : [settings.paragraphClassName, ...classnames];
 
-    let properties: Record<string, unknown> | undefined;
+    const properties = settings.paragraphProperties?.(alignment, classifications) ?? {};
 
-    if (settings.paragraphProperties) {
-      properties = settings.paragraphProperties(alignment, classifications);
+    Object.entries(properties).forEach(([k, v]) => {
+      if (
+        (typeof v === "string" && v === "") ||
+        (Array.isArray(v) && (v as unknown[]).length === 0)
+      ) {
+        properties[k] = undefined;
+      }
 
-      Object.entries(properties).forEach(([k, v]) => {
-        if (
-          (typeof v === "string" && v === "") ||
-          (Array.isArray(v) && (v as unknown[]).length === 0)
-        ) {
-          if (properties) {
-            properties[k] = undefined;
-          }
-        }
-
-        if (k === "className") delete properties?.["className"];
-      });
-    }
+      if (k === "className") delete properties?.["className"];
+    });
 
     return {
       type: "paragraph",
@@ -265,24 +259,18 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
         ? settings.wrapperClassName(alignment, classifications)
         : [settings.wrapperClassName];
 
-    let properties: Record<string, unknown> | undefined;
+    const properties = settings.wrapperProperties?.(alignment, classifications) ?? {};
 
-    if (settings.wrapperProperties) {
-      properties = settings.wrapperProperties(alignment, classifications);
+    Object.entries(properties).forEach(([k, v]) => {
+      if (
+        (typeof v === "string" && v === "") ||
+        (Array.isArray(v) && (v as unknown[]).length === 0)
+      ) {
+        properties[k] = undefined;
+      }
 
-      Object.entries(properties).forEach(([k, v]) => {
-        if (
-          (typeof v === "string" && v === "") ||
-          (Array.isArray(v) && (v as unknown[]).length === 0)
-        ) {
-          if (properties) {
-            properties[k] = undefined;
-          }
-        }
-
-        if (k === "className") delete properties?.["className"];
-      });
-    }
+      if (k === "className") delete properties?.["className"];
+    });
 
     return {
       type: "wrapper",
