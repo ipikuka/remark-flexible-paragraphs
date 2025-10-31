@@ -24,7 +24,7 @@ This package is a [**unified**][unified] ([**remark**][remark]) plugin **to add 
 
 ## When should I use this?
 
-This plugin is useful if you want to **add a custom paragraph** in markdown, _with alignment support, custom class names, custom classifications, and also additional properties_. This plugin also give an option to wrap the paragraph with a container. **You can easily center or align paragraphs with the `remark-flexible-paragraphs`.**
+**`remark-flexible-paragraphs`** is useful if you want to **add a custom paragraph** in markdown, _with alignment support, custom class names, custom classifications, and also additional properties_. This plugin also give an option to wrap the paragraph with a container. **You can easily center or align paragraphs with `remark-flexible-paragraphs`.**
 
 ## Installation
 
@@ -88,7 +88,7 @@ Now, running `node example.js` yields:\
 </div>
 ```
 
-Without `remark-flexible-paragraphs`, you’d get:
+Without **`remark-flexible-paragraphs`**, you’d get:
 
 ```html
 <p>I am a normal paragraph ~> I am a flexible paragraph => I am a flexible paragraph wrapped in a div</p>
@@ -605,7 +605,7 @@ This plugin works with `unified` version 6+ and `remark` version 7+. It is compa
 
 ## Security
 
-Use of `remark-flexible-paragraphs` does not involve rehype (hast) or user content so there are no openings for cross-site scripting (XSS) attacks.
+Use of **`remark-flexible-paragraphs`** does not involve rehype (hast) or user content so there are no openings for cross-site scripting (XSS) attacks.
 
 ## My Plugins
 
