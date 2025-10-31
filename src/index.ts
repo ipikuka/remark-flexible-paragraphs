@@ -342,7 +342,7 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
       _alignment = "justify";
     } else if (left) {
       _alignment = "left";
-    } else if (right) {
+    } else {
       _alignment = "right";
     }
 
