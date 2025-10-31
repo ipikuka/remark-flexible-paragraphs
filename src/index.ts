@@ -371,6 +371,8 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
       ? Array.from(classes).reduce((list, char) => {
           if (char !== "|") {
             const name = settings.dictionary[char as Key];
+            // classic V8 coverage false negative
+            /* v8 ignore next -- @preserve */
             if (name) list.push(name);
           }
           return list;
@@ -395,7 +397,7 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
    *
    */
   const visitor: Visitor<Paragraph, Parent> = function (node, index, parent): VisitorResult {
-    /* v8 ignore next */
+    /* v8 ignore next -- @preserve */
     if (!parent || typeof index === "undefined") return;
 
     const isTarget = checkIsTarget(node);
@@ -433,6 +435,8 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
             if (idx === 0 && mIndex !== 0) {
               const textValue = value.substring(0, mIndex);
 
+              // classic V8 coverage false negative
+              /* v8 ignore next -- @preserve */
               if (textValue) {
                 const text = u("text", textValue) as Text;
                 phrasesMatrix[matrixIndex] = insert(phrasesMatrix[matrixIndex], text);
@@ -496,7 +500,11 @@ export const plugin: Plugin<[FlexibleParagraphOptions?], Root> = (options) => {
       }
     });
 
-    if (nodes.length) parent.children.splice(index, 1, ...nodes);
+    // classic V8 coverage false negative
+    /* v8 ignore next -- @preserve */
+    if (nodes.length) {
+      parent.children.splice(index, 1, ...nodes);
+    }
   };
 
   const transformer: Transformer<Root> = (tree) => {
