@@ -370,6 +370,8 @@ describe("remark-flexigraph regex tests", () => {
       },
     ];
 
+    /* eslint-disable vitest/no-conditional-expect */
+
     fixtures.forEach((fixture) => {
       // console.log(fixture.input);
 
@@ -391,5 +393,7 @@ describe("remark-flexigraph regex tests", () => {
         expect(right).toBe(fixture.expect?.right);
       }
     });
+
+    /* eslint-enable vitest/no-conditional-expect */
   });
 });
