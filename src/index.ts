@@ -120,10 +120,14 @@ const dictionary: Dictionary = {
   "9": "type-9",
 };
 
-type RestrictedRecord = Record<string, unknown> & { className?: never };
+// from "hast", but I want to avoid importing that whole package just for this type
+interface Properties {
+    [PropertyName: string]: boolean | number | string | null | undefined | Array<string | number>;
+}
+
 type TagNameFunction = (alignment?: Alignment, classifications?: string[]) => string;
 type ClassNameFunction = (alignment?: Alignment, classifications?: string[]) => string[];
-type PropertyFunction = (alignment?: Alignment, classifications?: string[]) => RestrictedRecord;
+type PropertyFunction = (alignment?: Alignment, classifications?: string[]) => Omit<Properties, 'className'> & { className?: never };
 
 export type FlexibleParagraphOptions = {
   dictionary?: Dictionary;

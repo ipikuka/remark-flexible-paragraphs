@@ -172,13 +172,16 @@ Without **`remark-flexible-paragraphs`**, you’d get:
 All options are **optional** and have **default values**.
 
 ```javascript
+interface Properties {
+    [PropertyName: string]: boolean | number | string | null | undefined | Array<string | number>;
+}
+
 type Alignment = "center" | "left" | "right" | "justify";
-type RestrictedRecord = Record<string, unknown> & { className?: never };
 
 type Dictionary = Partial<Record<Key, string>>;
 type TagNameFunction = (alignment?: Alignment, classifications?: string[]) => string;
 type ClassNameFunction = (alignment?: Alignment, classifications?: string[]) => string[];
-type PropertyFunction = (alignment?: Alignment, classifications?: string[]) => RestrictedRecord;
+type PropertyFunction = (alignment?: Alignment, classifications?: string[]) => Omit<Properties, 'className'> & { className?: never };
 
 use(remarkFlexibleParagraphs, {
   dictionary?: Dictionary; // explained in the options section
